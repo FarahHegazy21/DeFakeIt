@@ -1,8 +1,8 @@
-import 'package:defakeit/Themes/theme.dart';
-import 'package:defakeit/screens/analysis_history_screen.dart';
-import 'package:defakeit/screens/home_screen.dart';
-import 'package:defakeit/screens/profile_screen.dart';
-import 'package:defakeit/screens/settings_screen.dart';
+import 'package:defakeit/core/theme/theme.dart';
+import 'package:defakeit/features/analysis_history/presentation/analysis_history_screen.dart';
+import 'package:defakeit/features/home/presentation/home_screen.dart';
+import 'package:defakeit/features/profile/presentation/screens/profile_screen.dart';
+import 'package:defakeit/features/settings/presentation/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -20,7 +20,6 @@ class _NavViewState extends State<NavView> {
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Set status bar color dynamically based on theme mode
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
@@ -34,7 +33,7 @@ class _NavViewState extends State<NavView> {
             right: 0,
             left: 0,
             child: Image.asset(
-              "assets/images/background_home_transparent.png",
+              "assets/images/background.png",
               fit: BoxFit.cover,
               color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),

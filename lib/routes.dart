@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// Auth screens
+import 'features/auth/presentation/login_screen.dart';
+
 // Home screens
 import 'features/home/presentation/detection_result_screen.dart';
 import 'features/home/presentation/home_screen.dart';
@@ -16,6 +19,9 @@ import 'nav_view.dart';
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/login':
+        return MaterialPageRoute(builder: (_) => const LoginScreen());
+
       case '/home':
         return MaterialPageRoute(builder: (_) => const NavView());
 

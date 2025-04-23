@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
-import '../audio_bloc/audio_repo.dart';
+import '../../data/repositories/audio_repo.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -10,10 +9,9 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final AudioRepo audioRepo;
 
-  HomeBloc(this.audioRepo) : super(HomeInitial()) {
-    on<AudioPicked>(_onAudioPicked);
+  HomeBloc({required this.audioRepo}) : super(HomeInitial()) {
     on<StartAnalysis>(_onStartAnalysis);
-    on<AnalysisFailed>(_onAnalysisFailed);
+    on<AudioPicked>(_onAudioPicked);
     on<ClearPickedAudio>(_onClearPickedAudio);
   }
 
@@ -25,24 +23,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<void> _onStartAnalysis(
-    StartAnalysis event,
-    Emitter<HomeState> emit,
-  ) async {
+      StartAnalysis event, Emitter<HomeState> emit) async {
     emit(AnalyzingState());
 
     try {
-      final result = await audioRepo.analyzeAudio(event.audioFile);
-      emit(AnalysisResultState(result.isFake, result.confidence));
-    } catch (e) {
-      emit(ErrorState(e.toString()));
-    }
-  }
+      final file = event.audioFile;
 
-  Future<void> _onAnalysisFailed(
-    AnalysisFailed event,
-    Emitter<HomeState> emit,
-  ) async {
-    emit(ErrorState(event.message));
+      if (!await file.exists()) {
+        emit(ErrorState("File does not exist."));
+        return;
+      }
+
+      if (await file.length() == 0) {
+        emit(ErrorState("Audio file is empty."));
+        return;
+      }
+
+      final result = await audioRepo
+          .analyzeAudio(file)
+          .timeout(const Duration(seconds: 15));
+      emit(AnalysisResultState(result.isFake, result.confidence));
+    } catch (e, stackTrace) {
+      emit(ErrorState("Analysis failed: ${e.toString()}"));
+      return;
+    }
   }
 
   void _onClearPickedAudio(

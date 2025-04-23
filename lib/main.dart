@@ -2,14 +2,20 @@ import 'package:defakeit/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/theme/theme.dart';
-import 'features/home/logic/audio_bloc/audio_repo.dart';
-import 'features/home/logic/home_bloc/home_bloc.dart'; // افترض أنك تستخدم هذا الملف للتنقل
+import 'features/auth/logic/auth_bloc.dart';
+import 'features/auth/logic/auth_event.dart';
+import 'features/auth/logic/auth_state.dart';
+import 'features/auth/presentation/login_screen.dart';
+import 'features/home/data/repositories/audio_repo.dart';
+import 'features/home/logic/home_bloc/home_bloc.dart';
+import 'nav_view.dart';
 
 void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(create: (_) => HomeBloc(AudioRepo())),
+        BlocProvider<HomeBloc>(create: (_) => HomeBloc(audioRepo: AudioRepo())),
+        BlocProvider<AuthBloc>(create: (_) => AuthBloc()..add(AppStarted())),
       ],
       child: const MyApp(),
     ),
@@ -26,8 +32,29 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      onGenerateRoute: AppRouter.generateRoute, // استخدم generateRoute هنا
-      initialRoute: '/home', // تعيين المسار الأول عند بدء التطبيق
+      onGenerateRoute: AppRouter.generateRoute,
+      home: const SplashScreen(),
+    );
+  }
+}
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthInitial || state is AuthLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (state is Authenticated) {
+          return const NavView();
+        } else {
+          return const LoginScreen();
+        }
+      },
     );
   }
 }

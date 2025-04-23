@@ -29,7 +29,10 @@ class UploadAudioScreen extends StatelessWidget {
             );
           } else if (state is ErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(
+                content: Text(state.message),
+                duration: Duration(seconds: 15),
+              ),
             );
           }
         },

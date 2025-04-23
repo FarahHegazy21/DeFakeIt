@@ -42,7 +42,7 @@ class DetectionResultScreen extends StatelessWidget {
                 lineWidth: 13.0,
                 percent: confidence.clamp(0.0, 1.0),
                 center: Text(
-                  "$confidencePercentage% $resultText",
+                  "$confidencePercentage% /n$resultText",
                   style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold, color: color),
                   textAlign: TextAlign.center,
@@ -52,7 +52,7 @@ class DetectionResultScreen extends StatelessWidget {
                 circularStrokeCap: CircularStrokeCap.round,
               ),
               const SizedBox(height: 20),
-              const Text("Confidence Level: High",
+              Text("Confidence Level: $confidence",
                   style: TextStyle(color: Colors.green)),
               const SizedBox(height: 20),
               Text(description,

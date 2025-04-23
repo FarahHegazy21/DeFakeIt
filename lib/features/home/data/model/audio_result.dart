@@ -3,7 +3,6 @@ class AudioResult {
   final double confidence;
   final String message;
 
-  // Constructor
   AudioResult({
     required this.isFake,
     required this.confidence,
@@ -12,17 +11,9 @@ class AudioResult {
 
   factory AudioResult.fromJson(Map<String, dynamic> json) {
     return AudioResult(
-      isFake: json['isFake'],
-      confidence: json['confidence'].toDouble(),
-      message: json['message'],
+      isFake: json['is_fake'] as bool,
+      confidence: (json['confidence'] as num).toDouble(),
+      message: json['message'] ?? '',
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'isFake': isFake,
-      'confidence': confidence,
-      'message': message,
-    };
   }
 }

@@ -60,7 +60,7 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
     setState(() {
       recordedFilePath = null;
       isRecording = false;
-      isRecorded = false; // نرجع لحالة البداية
+      isRecorded = false;
     });
     context.read<HomeBloc>().add(ClearPickedAudio());
   }
@@ -89,7 +89,10 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
             );
           } else if (state is ErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(
+                content: Text(state.message),
+                duration: Duration(seconds: 15),
+              ),
             );
           }
         },
@@ -131,11 +134,13 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                         ElevatedButton.icon(
                           icon: const Icon(Icons.analytics),
                           label: const Text("Analyze Audio"),
-                          onPressed: () {
-                            context.read<HomeBloc>().add(
-                                  StartAnalysis(File(recordedFilePath!)),
-                                );
-                          },
+                          onPressed: fileReady
+                              ? () {
+                                  context.read<HomeBloc>().add(
+                                        StartAnalysis(File(recordedFilePath!)),
+                                      );
+                                }
+                              : null,
                         ),
                         const SizedBox(width: 12),
                         ElevatedButton.icon(

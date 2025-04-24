@@ -70,7 +70,7 @@ class _NavViewState extends State<NavView> {
             borderRadius: BorderRadius.circular(30),
             child: BottomNavigationBar(
               backgroundColor:
-                  Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+              Theme.of(context).bottomNavigationBarTheme.backgroundColor,
               currentIndex: _selectedIndex,
               onTap: (index) {
                 setState(() {

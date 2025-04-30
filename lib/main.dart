@@ -1,11 +1,13 @@
 import 'package:defakeit/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/theme.dart';
 import 'features/auth/logic/auth_bloc.dart';
 import 'features/auth/logic/auth_event.dart';
 import 'features/auth/logic/auth_state.dart';
 import 'features/auth/presentation/login_screen.dart';
+import 'features/auth/presentation/splash_screen.dart';
 import 'features/home/data/repositories/audio_repo.dart';
 import 'features/home/logic/home_bloc/home_bloc.dart';
 import 'nav_view.dart';
@@ -38,23 +40,21 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        if (state is AuthInitial || state is AuthLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        } else if (state is Authenticated) {
-          return const NavView();
-        } else {
-          return const LoginScreen();
-        }
-      },
-    );
-  }
-}
+// class SplashScreen extends StatelessWidget {
+//   const SplashScreen({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<AuthBloc, AuthState>(
+//       builder: (context, state) {
+//         if (state is AuthInitial || state is AuthLoading) {
+//           return  const SplashScreen();
+//         } else if (state is Authenticated) {
+//           return const NavView();
+//         } else {
+//           return const LoginScreen();
+//         }
+//       },
+//     );
+//   }
+// }

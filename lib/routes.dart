@@ -1,9 +1,15 @@
+import 'package:defakeit/features/auth/presentation/splash_screen.dart';
+import 'package:defakeit/features/auth/presentation/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
 // Auth screens
+import 'features/auth/presentation/done_change_password.dart';
+import 'features/auth/presentation/forgot_password_screen.dart';
 import 'features/auth/presentation/login_screen.dart';
 
 // Home screens
+import 'features/auth/presentation/signup_screen.dart';
+import 'features/auth/presentation/verify_code_screen.dart';
 import 'features/home/presentation/detection_result_screen.dart';
 import 'features/home/presentation/home_screen.dart';
 import 'features/home/presentation/loading_screen.dart';
@@ -51,6 +57,24 @@ class AppRouter {
 
       case '/settings':
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
+
+      case '/signup':
+        return MaterialPageRoute(builder: (_) => const SignupScreen());
+
+      case '/forgotPassword':
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+
+      case '/verification':
+        return MaterialPageRoute(builder: (_) => const VerifyCodeScreen());
+
+      case '/doneChangePass':
+        return MaterialPageRoute(builder: (_) => const DoneChangePassword());
+
+      case '/splash':
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
+
+      case '/welcome':
+        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
 
       default:
         return MaterialPageRoute(

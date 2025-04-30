@@ -42,7 +42,7 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Center(
               child: SingleChildScrollView(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -50,9 +50,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back_ios,
                           color: Colors.black87, size: 22),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: () {Navigator.pop(context);},
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
@@ -137,7 +135,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         onPressed: () {},
                         child: Text(
-                          'Sign up',
+                          'Log In',
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -205,16 +203,16 @@ class _SignupScreenState extends State<SignupScreen> {
         prefixIcon: Icon(icon, color: Colors.grey[400]),
         suffixIcon: (hint.toLowerCase().contains('password'))
             ? IconButton(
-                icon: Icon(
-                  obscure ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey[400],
-                  size: 20,
-                ),
-                onPressed: onToggle,
-              )
+          icon: Icon(
+            obscure ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey[400],
+            size: 20,
+          ),
+          onPressed: onToggle,
+        )
             : null,
         contentPadding:
-            const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,

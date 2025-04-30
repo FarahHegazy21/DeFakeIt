@@ -134,45 +134,61 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: BlocConsumer<AuthBloc, AuthState>(
                           listener: (context, state) {
                             if (state is Authenticated) {
-                              Navigator.pushReplacementNamed(context, '/home');
+                              // عند تسجيل الدخول بنجاح، نعرض SnackBar
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Login successful!"),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              Navigator.pushReplacementNamed(context, '/home'); // توجيه لصفحة الرئيسية بعد النجاح
+                            }
+                            if (state is AuthError) {
+                              // في حالة حدوث خطأ في تسجيل الدخول، نعرض SnackBar
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(state.message), // عرض رسالة الخطأ
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
                             }
                           },
                           builder: (context, state) {
                             if (state is AuthLoading) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
+                              return const Center(child: CircularProgressIndicator()); // عرض loader أثناء تحميل البيانات
                             }
 
                             return ElevatedButton(
                               onPressed: () {
                                 final email = emailController.text.trim();
                                 final password = passwordController.text.trim();
+
+                                // إرسال event لتسجيل الدخول
                                 context.read<AuthBloc>().add(LoginRequested(
-                                    email: email, password: password));
+                                  email: email,
+                                  password: password,
+                                ));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
                                 minimumSize: Size(80, 20),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: Text(
                                 'Log in',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
                             );
                           },
-                        ),
+                        )
+
                       ),
 
                       const SizedBox(height: 12),

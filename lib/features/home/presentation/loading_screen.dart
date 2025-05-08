@@ -22,17 +22,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void startLoading() {
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       setState(() {
-        _progress += 0.02;
+        _progress += 0.001;
         if (_progress >= 1.0) {
           _timer?.cancel();
-          Navigator.pushReplacementNamed(
-            context,
-            '/detectionResult',
-            arguments: {
-              'isFake': false,
-              'confidence': 1.0,
-            },
-          );
         }
       });
     });

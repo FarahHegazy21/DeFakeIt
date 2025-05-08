@@ -11,7 +11,7 @@ class VerifyCodeScreen extends StatefulWidget {
 
 class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   final List<TextEditingController> _controllers =
-  List.generate(4, (index) => TextEditingController());
+      List.generate(4, (index) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
 
   @override
@@ -115,7 +115,7 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                         height: 58,
                         decoration: BoxDecoration(
                           color:
-                          const Color(0xFFE0E3EA), // Slightly darker grey
+                              const Color(0xFFE0E3EA), // Slightly darker grey
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextField(

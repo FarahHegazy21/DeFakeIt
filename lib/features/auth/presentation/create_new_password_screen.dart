@@ -6,13 +6,14 @@ class CreateNewPasswordScreen extends StatefulWidget {
   const CreateNewPasswordScreen({Key? key}) : super(key: key);
 
   @override
-  State<CreateNewPasswordScreen> createState() => _CreateNewPasswordScreenState();
+  State<CreateNewPasswordScreen> createState() =>
+      _CreateNewPasswordScreenState();
 }
 
 class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-  TextEditingController();
+      TextEditingController();
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
 

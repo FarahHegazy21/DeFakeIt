@@ -26,6 +26,8 @@ class StartAnalysis extends HomeEvent {
   List<Object> get props => [audioFile];
 }
 
+class ClearPickedAudio extends HomeEvent {}
+
 class AnalysisFailed extends HomeEvent {
   final String message;
 
@@ -33,8 +35,4 @@ class AnalysisFailed extends HomeEvent {
 
   @override
   List<Object> get props => [message];
-}
-
-class ClearPickedAudio extends HomeEvent {
-  const ClearPickedAudio();
 }

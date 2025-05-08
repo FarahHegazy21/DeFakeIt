@@ -1,161 +1,201 @@
 import 'dart:convert';
-
 import 'package:bloc/bloc.dart';
 import 'package:defakeit/core/constant/APIs_constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import '../../../core/APIs/post_login.dart';
+import '../../../core/APIs/post_signUp.dart';
+
 import 'auth_event.dart';
 import 'auth_state.dart';
-import 'package:http/http.dart' as http;
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  final _storage = const FlutterSecureStorage();
+
   AuthBloc() : super(AuthInitial()) {
     on<AppStarted>(_onAppStarted);
     on<LoginRequested>(_onLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<SignUpRequested>(_onSignUpRequested);
     on<GetHistoryRequested>(_onGetHistoryRequested);
+    //on<UpdateUserRequested>(_onUpdateUserRequested);
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
-    final prefs = await SharedPreferences.getInstance();
-    final loggedIn = prefs.getBool('loggedIn') ?? false;
-    if (loggedIn) {
+    emit(AuthLoading());
+
+    // Attempt Auto-Login
+    String? email = await _storage.read(key: 'email');
+    String? password = await _storage.read(key: 'password');
+    String? token = await _storage.read(key: 'token');
+
+    if (email != null && password != null) {
+      const maxRetries = 3;
+      for (int attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          final newToken = await login(email, password, rememberMe: true);
+          if (newToken != null) {
+            await _storage.write(key: 'token', value: newToken);
+            emit(Authenticated());
+            return;
+          } else {
+            await _storage.deleteAll();
+            emit(Unauthenticated(
+                message:
+                    "Login credentials have changed. Please log in again."));
+            return;
+          }
+        } on http.ClientException catch (e) {
+          if (e.message.contains('timeout') && attempt == maxRetries) {
+            emit(Unauthenticated(
+                message: "Server is offline. Please try again later."));
+            return;
+          }
+        } catch (e) {
+          if (attempt == maxRetries) {
+            await _storage.deleteAll();
+            emit(Unauthenticated(
+                message:
+                    "Auto-login failed after $maxRetries attempts. Please try again."));
+            return;
+          }
+        }
+        await Future.delayed(
+            Duration(seconds: attempt * 2)); // Exponential backoff
+      }
+    } else if (token != null) {
       emit(Authenticated());
     } else {
       emit(Unauthenticated());
     }
   }
 
-  // Future<void> _onLoginRequested(
-  //     LoginRequested event, Emitter<AuthState> emit) async {
-  //   emit(AuthLoading());
-  //
-  //   // Simulated login check
-  //   await Future.delayed(const Duration(seconds: 1));
-  //
-  //   // Save login state
-  //   final prefs = await SharedPreferences.getInstance();
-  //   await prefs.setBool('loggedIn', true);
-  //
-  //   emit(Authenticated());
-  // }
   Future<void> _onLoginRequested(
-      LoginRequested event,
-      Emitter<AuthState> emit
-      ) async {
+      LoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
-    final url = Uri.parse('$baseURL$logInEndPoint');
-
     try {
-      final response = await http.post(
-        url,
-        body: json.encode({
-          "email": event.email,
-          "password": event.password
-        }),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('loggedIn', true);
+      final token = await login(event.email, event.password,
+          rememberMe: event.rememberMe);
+      if (token != null) {
+        await _storage.write(key: 'token', value: token);
         emit(Authenticated());
       } else {
         emit(AuthError("Invalid credentials"));
       }
-      print(response.body);
-      print(response.statusCode);
     } catch (e) {
-      print(e.toString());
-      emit(AuthError("Login failed: ${e.toString()}"));
+      emit(AuthError("Login failed: $e"));
     }
   }
 
-  Future<void> _onSignUpRequested(SignUpRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onSignUpRequested(
+      SignUpRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
-    final url = Uri.parse('$baseURL$signUpEndPoint');
-
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          "username": event.username,
-          "email": event.email,
-          "password": event.password,
-        }),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('loggedIn', true);
+      final token = await signup(event.username, event.email, event.password,
+          rememberMe: event.rememberMe);
+      if (token != null) {
+        await _storage.write(key: 'token', value: token);
         emit(Authenticated());
-        print(response.body);
-        print(response.statusCode);
       } else {
-        emit(AuthError("Sign up failed: ${response.body}"));
-        print(response.body);
-        print(response.statusCode);
+        emit(AuthError("Sign up failed"));
       }
     } catch (e) {
-      emit(AuthError("Sign up error: ${e.toString()}"));
-      print(e.toString());
+      emit(AuthError("Sign up error: $e"));
     }
   }
-
 
   Future<void> _onLogoutRequested(
       LogoutRequested event, Emitter<AuthState> emit) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('loggedIn');
+    await _storage.deleteAll();
     emit(Unauthenticated());
   }
 
-  Future<http.Response> logIn({
-    required String email,
-    required String password,
-}) async {
-    final url = Uri.https(baseURL,logInEndPoint);
-    final http.Response response = await http.post(
-      url,
-      body: json.encode({
-        "email": "test@example.com",
-        "password": "test123"
-      })
-    );
-    emit(Authenticated());
-    print(response.body);
-    print(response.statusCode);
-    return response;
-  }
-
-  Future<void> _onGetHistoryRequested(GetHistoryRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onGetHistoryRequested(
+      GetHistoryRequested event, Emitter<AuthState> emit) async {
     emit(HistoryLoading());
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         emit(HistoryError(message: 'Token not found.'));
         return;
       }
 
       final response = await http.get(
-        Uri.https(baseURL, '/history'),
+        Uri.parse('${APIsConstants.baseURL}/history'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        final List<Map<String, dynamic>> history = data.cast<Map<String, dynamic>>();
+        final List<dynamic> data = jsonDecode(response.body);
+        final List<Map<String, dynamic>> history =
+            data.cast<Map<String, dynamic>>();
         emit(HistoryLoaded(history: history));
+      } else if (response.statusCode == 401) {
+        await _storage.deleteAll();
+        emit(Unauthenticated(message: "Session expired. Please log in again."));
       } else {
-        emit(HistoryError(message: 'Failed to load history.'));
+        emit(HistoryError(message: 'Failed to load history: ${response.body}'));
+      }
+    } on http.ClientException catch (e) {
+      if (e.message.contains('timeout')) {
+        emit(HistoryError(
+            message: 'Server is offline. Please try again later.'));
+      } else {
+        emit(HistoryError(message: e.toString()));
       }
     } catch (e) {
       emit(HistoryError(message: e.toString()));
     }
   }
+
+  /**Future<void> _onUpdateUserRequested(UpdateUserRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final token = await _storage.read(key: 'token');
+      if (token == null) {
+        emit(AuthError("Token not found."));
+        return;
+      }
+
+      final response = await http.put(
+        Uri.parse('${APIsConstants.baseURL}${APIsConstants.updateUserEndpoint}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          if (event.email != null) 'email': event.email,
+          if (event.password != null) 'password': event.password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final newToken = jsonResponse['token'] as String?;
+        if (newToken != null) {
+          await _storage.write(key: 'token', value: newToken);
+          if (event.email != null) await _storage.write(key: 'email', value: event.email);
+          if (event.password != null) await _storage.write(key: 'password', value: event.password);
+          emit(Authenticated());
+        } else {
+          emit(AuthError("No token returned from server"));
+        }
+      } else if (response.statusCode == 401) {
+        await _storage.deleteAll();
+        emit(Unauthenticated(message: "Session expired. Please log in again."));
+      } else {
+        emit(AuthError("Update failed: ${response.body}"));
+      }
+    } on http.ClientException catch (e) {
+      if (e.message.contains('timeout')) {
+        emit(AuthError("Server is offline. Please try again later."));
+      } else {
+        emit(AuthError("Update error: $e"));
+      }
+    } catch (e) {
+      emit(AuthError("Update error: $e"));
+    }
+  }**/
 }

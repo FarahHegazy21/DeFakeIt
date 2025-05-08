@@ -1,9 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'upload_audio_screen.dart';
 import 'record_audio_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _username = "User"; // Default value
+  final _storage = const FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    try {
+      final username = await _storage.read(key: 'username');
+      if (username != null && username.isNotEmpty) {
+        setState(() {
+          _username = username;
+        });
+      }
+    } catch (e) {
+      print("Error loading username: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +43,9 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Hi, Rose",
-                style: TextStyle(
+              Text(
+                "Hi, $_username",
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black87,
                 ),

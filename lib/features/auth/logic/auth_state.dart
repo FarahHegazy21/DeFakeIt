@@ -4,11 +4,15 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class Authenticated extends AuthState {}
+class Authenticated extends AuthState {
+  final String token; // إضافة الـ token هنا
+  Authenticated({required this.token});
+}
 
 class Unauthenticated extends AuthState {
   final String? message;
-  Unauthenticated({this.message});
+  final String? token; // إضافة الـ token هنا برضو
+  Unauthenticated({this.message, this.token});
 }
 
 class AuthError extends AuthState {

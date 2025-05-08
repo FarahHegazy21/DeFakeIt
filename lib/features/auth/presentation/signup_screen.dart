@@ -16,13 +16,13 @@ class _SignUpScreenState extends State<SignupScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool rememberMe = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image (optional)
           Positioned(
             top: 0,
             right: 0,
@@ -32,7 +32,6 @@ class _SignUpScreenState extends State<SignupScreen> {
               fit: BoxFit.cover,
             ),
           ),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(36.0),
@@ -43,19 +42,18 @@ class _SignUpScreenState extends State<SignupScreen> {
                     children: [
                       Text(
                         "Create Account",
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Color(0xFFA4A3A3),
-                          fontSize: 42,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              color: Color(0xFFA4A3A3),
+                              fontSize: 42,
+                            ),
                       ),
                       const SizedBox(height: 65),
-
-                      // Username field
                       TextField(
                         controller: usernameController,
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
+                        style: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.person_outline),
                           hintText: 'Username',
@@ -70,14 +68,10 @@ class _SignUpScreenState extends State<SignupScreen> {
                         ),
                       ),
                       const SizedBox(height: 30),
-
-                      // Email field
                       TextField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
+                        style: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.email_outlined),
                           hintText: 'Email Address',
@@ -92,14 +86,10 @@ class _SignUpScreenState extends State<SignupScreen> {
                         ),
                       ),
                       const SizedBox(height: 30),
-
-                      // Password field
                       TextField(
                         controller: passwordController,
                         obscureText: true,
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
+                        style: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock_outline),
                           hintText: 'Password',
@@ -113,28 +103,46 @@ class _SignUpScreenState extends State<SignupScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Sign up button
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: rememberMe,
+                            onChanged: (value) {
+                              setState(() {
+                                rememberMe = value ?? true;
+                              });
+                            },
+                          ),
+                          Text(
+                            'Remember Me',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Color(0xFFA4A3A3),
+                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: BlocConsumer<AuthBloc, AuthState>(
                           listener: (context, state) {
                             if (state is Authenticated) {
-                              // عند التسجيل بنجاح، نعرض SnackBar
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Registration successful!"),
                                   backgroundColor: Colors.green,
                                 ),
                               );
-                              Navigator.pushReplacementNamed(context, '/home'); // توجيه لصفحة الرئيسية
+                              Navigator.pushReplacementNamed(context, '/home');
                             }
                             if (state is AuthError) {
-                              // في حالة حدوث خطأ، نعرض SnackBar
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(state.message), // عرض رسالة الخطأ
+                                  content: Text(state.message),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -142,45 +150,46 @@ class _SignUpScreenState extends State<SignupScreen> {
                           },
                           builder: (context, state) {
                             if (state is AuthLoading) {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
-
                             return ElevatedButton(
                               onPressed: () {
                                 final username = usernameController.text.trim();
                                 final email = emailController.text.trim();
                                 final password = passwordController.text.trim();
-
-                                // إرسال event للتسجيل
                                 context.read<AuthBloc>().add(SignUpRequested(
-                                  username: username,
-                                  email: email,
-                                  password: password,
-                                ));
+                                      username: username,
+                                      email: email,
+                                      password: password,
+                                      rememberMe: rememberMe,
+                                    ));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
                                 minimumSize: Size(80, 20),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: Text(
                                 'Sign Up',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                               ),
                             );
                           },
-                        )
+                        ),
                       ),
                       const SizedBox(height: 12),
-
-                      // Already have an account
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

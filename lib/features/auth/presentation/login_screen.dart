@@ -1,7 +1,6 @@
 import 'package:defakeit/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../logic/auth_bloc.dart';
 import '../logic/auth_event.dart';
 import '../logic/auth_state.dart';
@@ -16,8 +15,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   bool isPasswordVisible = false;
+  bool rememberMe = true;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Positioned(
             top: 0,
             right: 0,
@@ -37,8 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
               color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),
           ),
-
-          // Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(36.0),
@@ -63,9 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                       ),
                       const SizedBox(height: 65),
-
-                      // Email field
-
                       TextField(
                         controller: emailController,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -89,8 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 30),
-
-                      // Password field
                       TextField(
                         controller: passwordController,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -126,28 +117,46 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Sign in button
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: rememberMe,
+                            onChanged: (value) {
+                              setState(() {
+                                rememberMe = value ?? true;
+                              });
+                            },
+                          ),
+                          Text(
+                            'Remember Me',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Color(0xFFA4A3A3),
+                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: BlocConsumer<AuthBloc, AuthState>(
                           listener: (context, state) {
                             if (state is Authenticated) {
-                              // عند تسجيل الدخول بنجاح، نعرض SnackBar
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Login successful!"),
                                   backgroundColor: Colors.green,
                                 ),
                               );
-                              Navigator.pushReplacementNamed(context, '/home'); // توجيه لصفحة الرئيسية بعد النجاح
+                              Navigator.pushReplacementNamed(context, '/home');
                             }
                             if (state is AuthError) {
-                              // في حالة حدوث خطأ في تسجيل الدخول، نعرض SnackBar
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(state.message), // عرض رسالة الخطأ
+                                  content: Text(state.message),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -155,47 +164,47 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           builder: (context, state) {
                             if (state is AuthLoading) {
-                              return const Center(child: CircularProgressIndicator()); // عرض loader أثناء تحميل البيانات
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
-
                             return ElevatedButton(
                               onPressed: () {
                                 final email = emailController.text.trim();
                                 final password = passwordController.text.trim();
-
-                                // إرسال event لتسجيل الدخول
                                 context.read<AuthBloc>().add(LoginRequested(
-                                  email: email,
-                                  password: password,
-                                ));
+                                      email: email,
+                                      password: password,
+                                      rememberMe: rememberMe,
+                                    ));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
                                 minimumSize: Size(80, 20),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: Text(
                                 'Log in',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                               ),
                             );
                           },
-                        )
-
+                        ),
                       ),
-
                       const SizedBox(height: 12),
                       Center(
                         child: TextButton(
                           onPressed: () {
-                            // Navigate to ForgotPassword
                             Navigator.pushNamed(context, '/forgotPassword');
                           },
                           child: Text(

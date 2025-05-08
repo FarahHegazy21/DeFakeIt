@@ -25,8 +25,26 @@ import 'nav_view.dart';
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/splash':
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
+
+      case '/welcome':
+        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+
       case '/login':
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+
+      case '/signup':
+        return MaterialPageRoute(builder: (_) => const SignupScreen());
+
+      case '/forgotPassword':
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+
+      case '/verification':
+        return MaterialPageRoute(builder: (_) => const VerifyCodeScreen());
+
+      case '/doneChangePass':
+        return MaterialPageRoute(builder: (_) => const DoneChangePassword());
 
       case '/home':
         return MaterialPageRoute(builder: (_) => const NavView());
@@ -41,11 +59,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoadingScreen());
 
       case '/detectionResult':
-        final args = settings.arguments as Map;
+        final args = settings.arguments as Map?;
         return MaterialPageRoute(
           builder: (_) => DetectionResultScreen(
-            isFake: args['isFake'],
-            confidence: args['confidence'],
+            isFake: args?['isFake'] as bool? ?? false,
+            confidence: args?['confidence'] as double? ?? 0.0,
+            audioName: args?['audioName'] as String? ?? '',
+            uploadDate: args?['uploadDate'] as String? ?? '',
+            message: args?['message'] as String?,
           ),
         );
 
@@ -57,24 +78,6 @@ class AppRouter {
 
       case '/settings':
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
-
-      case '/signup':
-        return MaterialPageRoute(builder: (_) => const SignupScreen());
-
-      case '/forgotPassword':
-        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
-
-      case '/verification':
-        return MaterialPageRoute(builder: (_) => const VerifyCodeScreen());
-
-      case '/doneChangePass':
-        return MaterialPageRoute(builder: (_) => const DoneChangePassword());
-
-      case '/splash':
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
-
-      case '/welcome':
-        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
 
       default:
         return MaterialPageRoute(

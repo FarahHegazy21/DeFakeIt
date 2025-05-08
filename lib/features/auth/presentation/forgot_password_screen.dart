@@ -97,7 +97,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                         ),
                         border: InputBorder.none,
                         contentPadding:
-                        const EdgeInsets.symmetric(vertical: 16),
+                            const EdgeInsets.symmetric(vertical: 16),
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -112,8 +112,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                         Navigator.pushNamed(context, '/verification');
                       },
                       style: ElevatedButton.styleFrom(
-                         backgroundColor: AppTheme.secondaryColor
-                      ),
+                          backgroundColor: AppTheme.secondaryColor),
                       child: Text(
                         'Send',
                         style: GoogleFonts.poppins(

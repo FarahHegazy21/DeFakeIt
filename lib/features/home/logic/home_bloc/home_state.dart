@@ -4,7 +4,7 @@ abstract class HomeState extends Equatable {
   const HomeState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class HomeInitial extends HomeState {}
@@ -13,7 +13,7 @@ class AudioPickedState extends HomeState {
   final File audioFile;
   final String fileName;
 
-  const AudioPickedState(this.audioFile, this.fileName);
+  const AudioPickedState({required this.audioFile, required this.fileName});
 
   @override
   List<Object> get props => [audioFile, fileName];
@@ -24,17 +24,27 @@ class AnalyzingState extends HomeState {}
 class AnalysisResultState extends HomeState {
   final bool isFake;
   final double confidence;
+  final String audioName;
+  final String uploadDate;
+  final String? message;
 
-  const AnalysisResultState(this.isFake, this.confidence);
+  const AnalysisResultState({
+    required this.isFake,
+    required this.confidence,
+    required this.audioName,
+    required this.uploadDate,
+    this.message,
+  });
 
   @override
-  List<Object> get props => [isFake, confidence];
+  List<Object?> get props =>
+      [isFake, confidence, audioName, uploadDate, message];
 }
 
 class ErrorState extends HomeState {
   final String message;
 
-  const ErrorState(this.message);
+  const ErrorState({required this.message});
 
   @override
   List<Object> get props => [message];

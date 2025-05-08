@@ -85,13 +85,16 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
               arguments: {
                 'isFake': state.isFake,
                 'confidence': state.confidence,
+                'audioName': state.audioName,
+                'uploadDate': state.uploadDate,
+                'message': state.message,
               },
             );
           } else if (state is ErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                duration: Duration(seconds: 15),
+                duration: const Duration(seconds: 15),
               ),
             );
           }
@@ -116,7 +119,7 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
               if (isRecorded)
                 Column(
                   children: [
-                    Center(
+                    const Center(
                       child: Text(
                         "Audio recorded successfully ✅",
                         style: TextStyle(
@@ -157,5 +160,11 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    record.dispose();
+    super.dispose();
   }
 }

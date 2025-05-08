@@ -50,7 +50,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 // AppBar
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -78,7 +78,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 // Search bar
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
@@ -95,7 +95,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                         prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                         border: InputBorder.none,
                         contentPadding:
-                        const EdgeInsets.symmetric(vertical: 14),
+                            const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -129,18 +129,18 @@ class _LanguageScreenState extends State<LanguageScreen> {
                         ),
                         trailing: _selectedLanguage == lang
                             ? Container(
-                          width: 22,
-                          height: 22,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF233C7B),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        )
+                                width: 22,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF233C7B),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              )
                             : null,
                         onTap: () {
                           setState(() {

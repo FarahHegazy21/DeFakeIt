@@ -25,13 +25,16 @@ class UploadAudioScreen extends StatelessWidget {
               arguments: {
                 'isFake': state.isFake,
                 'confidence': state.confidence,
+                'audioName': state.audioName,
+                'uploadDate': state.uploadDate,
+                'message': state.message,
               },
             );
           } else if (state is ErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                duration: Duration(seconds: 15),
+                duration: const Duration(seconds: 5),
               ),
             );
           }

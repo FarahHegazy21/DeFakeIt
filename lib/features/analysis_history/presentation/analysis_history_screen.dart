@@ -96,18 +96,37 @@ class AudioListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // استخراج البيانات من الـ audio
+    String audioName = audio['audio_name'] ?? 'Unknown';
+    String uploadDate = audio['upload_date'] ?? '';
+    String notes = audio['notes'] ?? 'No notes available';
+    String format = audio['format'] ?? 'Unknown format';
+    double confidence = audio['confidence'] ?? 0.0;
+    double size = audio['size'] ?? 0.0;
     bool isFake = audio['is_fake'] ?? false;
+
     return InkWell(
       onTap: () {
+        // الانتقال لصفحة AudioAnalysisScreen وتمرير البيانات
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Audio2Screen()),
+          MaterialPageRoute(
+            builder: (context) => AudioAnalysisScreen(
+              audioName: audioName,
+              isFake: isFake,
+              confidence: confidence,
+              uploadDate: uploadDate,
+              notes: notes,
+              format: format,
+              size: size,
+            ),
+          ),
         );
       },
       child: ListTile(
         leading: const Icon(Icons.mic),
-        title: Text(audio['audio_name'] ?? 'Unknown'),
-        subtitle: Text(audio['upload_date'] ?? ''),
+        title: Text(audioName),
+        subtitle: Text(uploadDate),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

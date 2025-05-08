@@ -18,7 +18,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogoutRequested>(_onLogoutRequested);
     on<SignUpRequested>(_onSignUpRequested);
     on<GetHistoryRequested>(_onGetHistoryRequested);
-    //on<UpdateUserRequested>(_onUpdateUserRequested);
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
@@ -36,13 +35,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           final newToken = await login(email, password, rememberMe: true);
           if (newToken != null) {
             await _storage.write(key: 'token', value: newToken);
-            emit(Authenticated());
+            emit(Authenticated(token: newToken)); // تمرير الـ token هنا
             return;
           } else {
             await _storage.deleteAll();
             emit(Unauthenticated(
                 message:
-                    "Login credentials have changed. Please log in again."));
+                "Login credentials have changed. Please log in again."));
             return;
           }
         } on http.ClientException catch (e) {
@@ -56,7 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             await _storage.deleteAll();
             emit(Unauthenticated(
                 message:
-                    "Auto-login failed after $maxRetries attempts. Please try again."));
+                "Auto-login failed after $maxRetries attempts. Please try again."));
             return;
           }
         }
@@ -64,7 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             Duration(seconds: attempt * 2)); // Exponential backoff
       }
     } else if (token != null) {
-      emit(Authenticated());
+      emit(Authenticated(token: token)); // تمرير الـ token هنا
     } else {
       emit(Unauthenticated());
     }
@@ -79,7 +78,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           rememberMe: event.rememberMe);
       if (token != null) {
         await _storage.write(key: 'token', value: token);
-        emit(Authenticated());
+        emit(Authenticated(token: token)); // تمرير الـ token هنا
       } else {
         emit(AuthError("Invalid credentials"));
       }
@@ -97,7 +96,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           rememberMe: event.rememberMe);
       if (token != null) {
         await _storage.write(key: 'token', value: token);
-        emit(Authenticated());
+        emit(Authenticated(token: token)); // تمرير الـ token هنا
       } else {
         emit(AuthError("Sign up failed"));
       }
@@ -130,7 +129,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         final List<Map<String, dynamic>> history =
-            data.cast<Map<String, dynamic>>();
+        data.cast<Map<String, dynamic>>();
         emit(HistoryLoaded(history: history));
       } else if (response.statusCode == 401) {
         await _storage.deleteAll();
@@ -149,53 +148,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(HistoryError(message: e.toString()));
     }
   }
-
-  /**Future<void> _onUpdateUserRequested(UpdateUserRequested event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-    try {
-      final token = await _storage.read(key: 'token');
-      if (token == null) {
-        emit(AuthError("Token not found."));
-        return;
-      }
-
-      final response = await http.put(
-        Uri.parse('${APIsConstants.baseURL}${APIsConstants.updateUserEndpoint}'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          if (event.email != null) 'email': event.email,
-          if (event.password != null) 'password': event.password,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        final newToken = jsonResponse['token'] as String?;
-        if (newToken != null) {
-          await _storage.write(key: 'token', value: newToken);
-          if (event.email != null) await _storage.write(key: 'email', value: event.email);
-          if (event.password != null) await _storage.write(key: 'password', value: event.password);
-          emit(Authenticated());
-        } else {
-          emit(AuthError("No token returned from server"));
-        }
-      } else if (response.statusCode == 401) {
-        await _storage.deleteAll();
-        emit(Unauthenticated(message: "Session expired. Please log in again."));
-      } else {
-        emit(AuthError("Update failed: ${response.body}"));
-      }
-    } on http.ClientException catch (e) {
-      if (e.message.contains('timeout')) {
-        emit(AuthError("Server is offline. Please try again later."));
-      } else {
-        emit(AuthError("Update error: $e"));
-      }
-    } catch (e) {
-      emit(AuthError("Update error: $e"));
-    }
-  }**/
 }

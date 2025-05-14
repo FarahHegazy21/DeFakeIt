@@ -49,3 +49,24 @@ class ErrorState extends HomeState {
   @override
   List<Object> get props => [message];
 }
+
+class HistoryLoading extends HomeState {}
+
+class HistoryLoaded extends HomeState {
+  final List<Map<String, dynamic>> history;
+  final int totalAudios;
+
+  const HistoryLoaded({required this.history, required this.totalAudios});
+
+  @override
+  List<Object> get props => [history];
+}
+
+class HistoryError extends HomeState {
+  final String message;
+
+  const HistoryError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

@@ -78,7 +78,7 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.pushNamed(context, '/login');
                     },
                     child: Text(
-                      'Sign In',
+                      'Log In',
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -91,7 +91,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 18),
               // Or sign in with
               Text(
-                'Or Sign In With',
+                'Or Log In With',
                 style: GoogleFonts.poppins(
                   color: Colors.grey[500],
                   fontWeight: FontWeight.w400,

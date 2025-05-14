@@ -54,6 +54,31 @@ class AudioService {
     }
     throw Exception('Failed to upload audio after $retries attempts');
   }
+
+  Future<List<Map<String, dynamic>>> getAudioHistory(String token) async {
+    try {
+      final url =
+          Uri.parse('${APIsConstants.baseURL}${APIsConstants.historyEndpoint}');
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      debugPrint("📩 API Status Code: ${response.statusCode}");
+      debugPrint("📦 API Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as List;
+        return data.map((audio) => audio as Map<String, dynamic>).toList();
+      } else {
+        throw Exception(
+            'API returned status code: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("❌ Exception during API call: $e");
+      throw Exception('Failed to get audio history: $e');
+    }
+  }
 }
 
 // Custom exceptions

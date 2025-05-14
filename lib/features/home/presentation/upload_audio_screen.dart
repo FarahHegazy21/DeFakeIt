@@ -3,6 +3,7 @@ import 'package:defakeit/features/home/logic/home_bloc/home_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/theme/theme.dart';
 
 class UploadAudioScreen extends StatelessWidget {
   const UploadAudioScreen({super.key});
@@ -11,8 +12,17 @@ class UploadAudioScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upload Audio'),
+        title: Text(
+          'Upload Audio',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
         backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: BlocListener<HomeBloc, HomeState>(
         listener: (context, state) {
@@ -34,6 +44,7 @@ class UploadAudioScreen extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
+                backgroundColor: Colors.red,
                 duration: const Duration(seconds: 5),
               ),
             );
@@ -43,30 +54,86 @@ class UploadAudioScreen extends StatelessWidget {
           builder: (context, state) {
             if (state is AudioPickedState) {
               return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.audiotrack, size: 80, color: Colors.green),
-                    const SizedBox(height: 12),
-                    Text('Picked: ${state.fileName}'),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<HomeBloc>().add(
-                              StartAnalysis(state.audioFile),
-                            );
-                      },
-                      child: const Text('Analyze Audio'),
-                    ),
-                    const SizedBox(height: 12),
-                    TextButton.icon(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      label: const Text('Delete Audio'),
-                      onPressed: () {
-                        context.read<HomeBloc>().add(ClearPickedAudio());
-                      },
-                    ),
-                  ],
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.audiotrack,
+                        size: 80,
+                        color: AppTheme.secondaryColor,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Selected: ${state.fileName}',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.read<HomeBloc>().add(
+                                  StartAnalysis(state.audioFile),
+                                );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.secondaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Analyze Audio',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton.icon(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          label: const Text(
+                            'Remove File',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          onPressed: () {
+                            context.read<HomeBloc>().add(ClearPickedAudio());
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                  color: Colors.red.withOpacity(0.3)),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               );
             }
@@ -75,32 +142,57 @@ class UploadAudioScreen extends StatelessWidget {
               return Center(
                 child: Text(
                   'Error: ${state.message}',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 16,
+                  ),
                 ),
               );
             }
 
             return Center(
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file),
-                label: const Text('Pick Audio File'),
-                onPressed: () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(
-                    type: FileType.custom,
-                    allowedExtensions: ['mp3', 'wav'],
-                  );
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: 60,
+                child: ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.upload_file,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    'Upload Audio File',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 24),
+                    elevation: 5,
+                    shadowColor: Colors.black.withOpacity(0.3),
+                  ),
+                  onPressed: () async {
+                    FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['mp3', 'wav'],
+                      allowMultiple: false,
+                    );
 
-                  if (result != null && result.files.single.path != null) {
-                    final file = File(result.files.single.path!);
-                    final fileName = result.files.single.name;
-                    context.read<HomeBloc>().add(AudioPicked(file, fileName));
-                  } else {
-                    context
-                        .read<HomeBloc>()
-                        .add(const AnalysisFailed('No file selected.'));
-                  }
-                },
+                    if (result != null && result.files.single.path != null) {
+                      final file = File(result.files.single.path!);
+                      final fileName = result.files.single.name;
+                      context.read<HomeBloc>().add(AudioPicked(file, fileName));
+                    }
+                  },
+                ),
               ),
             );
           },

@@ -4,7 +4,13 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class Authenticated extends AuthState {}
+class Authenticated extends AuthState {
+  final String? username;
+
+  Authenticated({this.username});
+
+  List<Object?> get props => [username];
+}
 
 class Unauthenticated extends AuthState {
   final String? message;
@@ -26,4 +32,14 @@ class HistoryLoaded extends AuthState {
 class HistoryError extends AuthState {
   final String message;
   HistoryError({required this.message});
+}
+
+class UserUpdatedState extends AuthState {
+  final String username;
+  final String email;
+
+  UserUpdatedState({required this.username, required this.email});
+
+  @override
+  List<Object> get props => [username, email];
 }

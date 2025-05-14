@@ -22,13 +22,18 @@ Future<String?> login(String email, String password,
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final token = data['token'] as String?;
+      final username = data['username'] as String?;
+
       if (token != null) {
         if (rememberMe) {
           await storage.write(key: 'email', value: email);
           await storage.write(key: 'password', value: password);
           await storage.write(key: 'token', value: token);
+          if (username != null) {
+            await storage.write(key: 'username', value: username);
+          }
         }
-        print("Login Success. Token: $token");
+        print("Login Success. Token: $token, Username: $username");
         return token;
       }
     }

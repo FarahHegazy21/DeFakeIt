@@ -30,8 +30,11 @@ class LogoutRequested extends AuthEvent {}
 class GetHistoryRequested extends AuthEvent {}
 
 class UpdateUserRequested extends AuthEvent {
-  final String? email;
-  final String? password;
+  final String username;
+  final String email;
 
-  UpdateUserRequested({this.email, this.password});
+  UpdateUserRequested({required this.username, required this.email});
+
+  @override
+  List<Object> get props => [username, email];
 }

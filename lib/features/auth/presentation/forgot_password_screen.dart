@@ -1,18 +1,81 @@
 import 'package:defakeit/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class ForgotPasswordScreen extends StatelessWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+import '../../../core/constant/APIs_constants.dart';
+
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
+  @override
+  _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _storage = const FlutterSecureStorage();
+  final _emailController = TextEditingController();
+  bool _isLoading = false;
+  String? _infoMessage;
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  Future<void> _sendVerificationCode() async {
+    final email = _emailController.text.trim();
+
+    if (!_isValidEmail(email)) {
+      setState(() => _infoMessage = 'Please enter a valid email address');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _infoMessage = null;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+            '${APIsConstants.baseURL}${APIsConstants.forgotPasswordEndpoint}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      await _storage.write(key: 'reset_email', value: email);
+
+      if (response.statusCode == 200) {
+        Navigator.pushNamed(context, '/verification');
+      } else {
+        setState(() {
+          _infoMessage =
+              'If this email is registered, you will receive a verification code shortly.';
+        });
+      }
+    } catch (e) {
+      setState(() => _infoMessage = 'Network error. Please try again.');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background pattern
           Positioned(
             top: 0,
             right: 0,
@@ -29,20 +92,14 @@ class ForgotPasswordScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Back button
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back_ios, size: 20),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ),
                   const SizedBox(height: 38),
-                  // Title: "Forgot Password!"
                   RichText(
                     text: TextSpan(
                       children: [
@@ -67,7 +124,6 @@ class ForgotPasswordScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Description
                   Text(
                     'Please Enter Your Email Address To Receive a Verification Code.',
                     style: GoogleFonts.poppins(
@@ -77,13 +133,13 @@ class ForgotPasswordScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 36),
-                  // Email field
                   Container(
                     decoration: BoxDecoration(
                       color: const Color(0xFFF6F6F6),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextField(
+                      controller: _emailController,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(
                           Icons.email_outlined,
@@ -102,29 +158,38 @@ class ForgotPasswordScreen extends StatelessWidget {
                       keyboardType: TextInputType.emailAddress,
                     ),
                   ),
+                  if (_infoMessage != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _infoMessage!,
+                      style: GoogleFonts.poppins(
+                        color: Colors.red,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
-                  // Send button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/verification');
-                      },
+                      onPressed: _isLoading ? null : _sendVerificationCode,
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.secondaryColor),
-                      child: Text(
-                        'Send',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
+                        backgroundColor: AppTheme.secondaryColor,
                       ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              'Send',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 36),
-                  // Sign In link
                   Center(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -137,10 +202,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            // Navigation logic for sign in
-                            Navigator.pushNamed(context, '/signup');
-                          },
+                          onTap: () => Navigator.pushNamed(context, '/signup'),
                           child: Text(
                             'Sign In',
                             style: GoogleFonts.poppins(

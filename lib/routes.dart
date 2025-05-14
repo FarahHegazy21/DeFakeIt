@@ -1,3 +1,4 @@
+import 'package:defakeit/features/auth/presentation/create_new_password_screen.dart';
 import 'package:defakeit/features/auth/presentation/splash_screen.dart';
 import 'package:defakeit/features/auth/presentation/welcome_screen.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,10 @@ class AppRouter {
 
       case '/verification':
         return MaterialPageRoute(builder: (_) => const VerifyCodeScreen());
+
+      case '/createNewPassword':
+        return MaterialPageRoute(
+            builder: (_) => const CreateNewPasswordScreen());
 
       case '/doneChangePass':
         return MaterialPageRoute(builder: (_) => const DoneChangePassword());

@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userData = {
           'username': username ?? 'User',
           'email': email ?? 'user@example.com',
-          'totalAudios': 0, // We'll update this from the BLoC later
+          'totalAudios': 0,
         };
       });
 

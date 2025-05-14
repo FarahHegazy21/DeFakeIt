@@ -74,7 +74,7 @@ class UploadAudioScreen extends StatelessWidget {
                       Icon(
                         Icons.audiotrack,
                         size: 80,
-                        color: AppTheme.secondaryColor,
+                        color: AppTheme.primaryColor,
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -97,7 +97,7 @@ class UploadAudioScreen extends StatelessWidget {
                                 );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.secondaryColor,
+                            backgroundColor: AppTheme.primaryColor,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(

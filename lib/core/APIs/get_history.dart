@@ -2,13 +2,17 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../constant/APIs_constants.dart';
+
 Future<List<Map<String, dynamic>>> getHistory(String token) async {
-  final url = Uri.parse('http://10.0.2.2:5000/history');
+  final url =
+      Uri.parse('${APIsConstants.baseURL}${APIsConstants.historyEndpoint}');
 
   final response = await http.get(
     url,
     headers: {
       'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
     },
   );
 

@@ -28,9 +28,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _onStartAnalysis(
       StartAnalysis event, Emitter<HomeState> emit) async {
-    if (_hasAnalyzed) {
-      return;
-    }
+    if (_hasAnalyzed) return;
 
     emit(AnalyzingState());
     try {
@@ -41,7 +39,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
 
       final result = await audioService.uploadAudio(event.audioFile, token);
-
       _hasAnalyzed = true;
 
       emit(AnalysisResultState(
@@ -82,9 +79,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         return;
       }
 
-      final result = await audioService.getAudioHistory(token);
-      final totalAudios = result.length;
-      emit(HistoryLoaded(history: result, totalAudios: totalAudios));
+      final history = await audioService.getAudioHistory(token);
+      emit(HistoryLoaded(history: history, totalAudios: history.length));
+    } on InvalidTokenException {
+      await _storage.deleteAll();
+      emit(const ErrorState(message: 'Session expired. Please log in again.'));
+    } on ServerOfflineException {
+      emit(const ErrorState(
+          message: 'Server is offline. Please try again later.'));
     } catch (e) {
       emit(ErrorState(message: 'Failed to fetch history: $e'));
     }

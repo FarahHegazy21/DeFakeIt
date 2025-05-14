@@ -15,13 +15,12 @@ class UserService {
     emailNotifier.value = email;
   }
 
-  Future<void> updateUsername(String username) async {
-    await _storage.write(key: 'username', value: username);
+  Future<void> updateUserData(String username, String email) async {
+    await Future.wait([
+      _storage.write(key: 'username', value: username),
+      _storage.write(key: 'email', value: email),
+    ]);
     usernameNotifier.value = username;
-  }
-
-  Future<void> updateEmail(String email) async {
-    await _storage.write(key: 'email', value: email);
     emailNotifier.value = email;
   }
 

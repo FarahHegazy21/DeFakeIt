@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print("Error loading username: $e");
+      debugPrint("Error loading username: $e");
     }
   }
 

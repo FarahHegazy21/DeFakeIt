@@ -3,8 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 
+import '../constant/APIs_constants.dart';
+
 Future<void> uploadAudio(File audioFile, String token) async {
-  final url = Uri.parse('http://10.0.2.2:5000/upload_audio');
+  final url =
+      Uri.parse('${APIsConstants.baseURL}${APIsConstants.uploadAudioEndpoint}');
 
   final mimeType = lookupMimeType(audioFile.path);
 

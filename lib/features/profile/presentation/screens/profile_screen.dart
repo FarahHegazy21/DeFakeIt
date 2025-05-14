@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../auth/logic/auth_bloc.dart';
-import '../../../auth/logic/auth_event.dart';
 import '../../../home/logic/home_bloc/home_bloc.dart';
 import 'edit_profile_screen.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -29,6 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _loadUserData();
+    context.read<HomeBloc>().add(GetAudiosCount());
   }
 
   Future<void> _loadUserData() async {
@@ -40,12 +39,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userData = {
           'username': username ?? 'User',
           'email': email ?? 'user@example.com',
-          'totalAudios': 0,
+          'totalAudios': _userData['totalAudios'],
         };
       });
-
-      // Fetch total audios from the BLoC
-      context.read<AuthBloc>().add(GetHistoryRequested());
     } catch (e) {
       debugPrint('Error loading user data: $e');
     } finally {
@@ -126,13 +122,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 icon: Icons.email,
                               ),
                               const SizedBox(height: 15),
-                              BlocBuilder<HomeBloc, HomeState>(
-                                builder: (context, state) {
+                              BlocConsumer<HomeBloc, HomeState>(
+                                listener: (context, state) {
                                   if (state is HistoryLoaded) {
-                                    _userData['totalAudios'] =
-                                        state.totalAudios;
+                                    setState(() {
+                                      _userData['totalAudios'] =
+                                          state.totalAudios;
+                                    });
                                   }
-
+                                },
+                                builder: (context, state) {
+                                  if (state is HistoryLoading) {
+                                    return _buildInfoCard(
+                                      context,
+                                      title: 'Total Audios',
+                                      value: 'Loading...',
+                                      icon: Icons.audio_file,
+                                    );
+                                  }
                                   return _buildInfoCard(
                                     context,
                                     title: 'Total Audios',
@@ -167,12 +174,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         key: 'email',
                                         value: _userData['email'],
                                       );
-                                      context
-                                          .read<AuthBloc>()
-                                          .add(UpdateUserRequested(
-                                            username: _userData['username'],
-                                            email: _userData['email'],
-                                          ));
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(

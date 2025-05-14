@@ -59,7 +59,7 @@ class HistoryLoaded extends HomeState {
   const HistoryLoaded({required this.history, required this.totalAudios});
 
   @override
-  List<Object> get props => [history];
+  List<Object> get props => [history, totalAudios];
 }
 
 class HistoryError extends HomeState {

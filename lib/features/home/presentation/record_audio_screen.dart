@@ -241,7 +241,7 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.secondaryColor,
+                                backgroundColor: AppTheme.primaryColor,
                                 foregroundColor: Colors.white,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16),

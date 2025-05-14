@@ -1,5 +1,5 @@
 class APIsConstants {
-  static const String baseURL = 'http://10.0.2.2:5000';
+  static const String baseURL = 'https://myfakeaudio.loca.lt';
   static const String logInEndPoint = '/login';
   static const String signUpEndPoint = '/signup';
   static const String uploadAudioEndpoint = '/upload_audio';

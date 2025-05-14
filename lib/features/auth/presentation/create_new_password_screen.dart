@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../../../core/constant/APIs_constants.dart';
 
 class CreateNewPasswordScreen extends StatefulWidget {
   const CreateNewPasswordScreen({Key? key}) : super(key: key);
@@ -14,8 +19,25 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final _storage = const FlutterSecureStorage();
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
+  bool _isLoading = false;
+  String? _errorMessage;
+  String? _resetToken;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadResetToken();
+  }
+
+  Future<void> _loadResetToken() async {
+    final token = await _storage.read(key: 'reset_token');
+    setState(() {
+      _resetToken = token;
+    });
+  }
 
   @override
   void dispose() {
@@ -24,13 +46,87 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
     super.dispose();
   }
 
+  Future<void> _resetPassword() async {
+    if (_resetToken == null || _resetToken!.isEmpty) {
+      setState(() {
+        _errorMessage = 'Session expired. Please try again.';
+      });
+      return;
+    }
+
+    final newPassword = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (newPassword.isEmpty || confirmPassword.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all fields';
+      });
+      return;
+    }
+
+    if (newPassword != confirmPassword) {
+      setState(() {
+        _errorMessage = 'Passwords do not match';
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setState(() {
+        _errorMessage = 'Password must be at least 6 characters';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+            '${APIsConstants.baseURL}${APIsConstants.resetPasswordEndpoint}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'reset_token': _resetToken,
+          'new_password': newPassword,
+        }),
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        // Update password in secure storage
+        await _storage.write(key: 'password', value: newPassword);
+        // Clear the reset token as it's no longer needed
+        await _storage.delete(key: 'reset_token');
+
+        // Navigate to success screen or login screen
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/passwordResetSuccess', (route) => false);
+      } else {
+        setState(() {
+          _errorMessage = responseData['message'] ?? 'Failed to reset password';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Network error. Please try again.';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background pattern (subtle)
           Positioned.fill(
             child: Image.asset(
               'assets/images/Background.png',
@@ -45,7 +141,6 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Back button
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
                     child: IconButton(
@@ -62,8 +157,6 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
-                  // Title: "Create New Password"
                   Text(
                     'Create',
                     style: GoogleFonts.poppins(
@@ -80,10 +173,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                       fontSize: 32,
                     ),
                   ),
-
                   const SizedBox(height: 40),
-
-                  // New Password field
                   _buildPasswordField(
                     controller: _passwordController,
                     hint: 'New Password',
@@ -94,10 +184,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                       });
                     },
                   ),
-
                   const SizedBox(height: 16),
-
-                  // Confirm Password field
                   _buildPasswordField(
                     controller: _confirmPasswordController,
                     hint: 'Confirm Password',
@@ -108,31 +195,38 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                       });
                     },
                   ),
-
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _errorMessage!,
+                      style: GoogleFonts.poppins(
+                        color: Colors.red,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 32),
-
-                  // Save button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Save password logic
-                      },
+                      onPressed: _isLoading ? null : _resetPassword,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1F2B6C),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
-                        'Save',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              'Save',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                 ],

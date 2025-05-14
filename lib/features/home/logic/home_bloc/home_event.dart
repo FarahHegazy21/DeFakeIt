@@ -36,3 +36,5 @@ class AnalysisFailed extends HomeEvent {
   @override
   List<Object> get props => [message];
 }
+
+class GetAudiosCount extends HomeEvent {}

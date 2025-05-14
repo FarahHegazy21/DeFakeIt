@@ -28,26 +28,25 @@ class _NavViewState extends State<NavView> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            top: 0,
-            right: 0,
-            left: 0,
-            child: Image.asset(
-              "assets/images/background.png",
-              fit: BoxFit.cover,
-              color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
+          if (_selectedIndex != 2)
+            Positioned(
+              top: 0,
+              right: 0,
+              left: 0,
+              child: Image.asset(
+                "assets/images/background.png",
+                fit: BoxFit.cover,
+                color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
+              ),
             ),
-          ),
-          SafeArea(
-            child: IndexedStack(
-              index: _selectedIndex,
-              children: const [
-                HomeScreen(),
-                AnalysisHistoryScreen(),
-                ProfileScreen(),
-                SettingsScreen(),
-              ],
-            ),
+          IndexedStack(
+            index: _selectedIndex,
+            children: const [
+              HomeScreen(),
+              AnalysisHistoryScreen(),
+              ProfileScreen(),
+              SettingsScreen(),
+            ],
           ),
         ],
       ),
@@ -70,7 +69,7 @@ class _NavViewState extends State<NavView> {
             borderRadius: BorderRadius.circular(30),
             child: BottomNavigationBar(
               backgroundColor:
-              Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+                  Theme.of(context).bottomNavigationBarTheme.backgroundColor,
               currentIndex: _selectedIndex,
               onTap: (index) {
                 setState(() {

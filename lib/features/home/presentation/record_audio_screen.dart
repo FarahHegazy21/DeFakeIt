@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:defakeit/features/home/logic/home_bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
+import '../../../core/theme/theme.dart';
 
 class RecordAudioScreen extends StatefulWidget {
   const RecordAudioScreen({super.key});
@@ -14,10 +16,12 @@ class RecordAudioScreen extends StatefulWidget {
 }
 
 class _RecordAudioScreenState extends State<RecordAudioScreen> {
-  final record = AudioRecorder();
-  bool isRecording = false;
-  String? recordedFilePath;
-  bool isRecorded = false;
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  bool _isRecording = false;
+  String? _recordedFilePath;
+  bool _isRecorded = false;
+  int _recordingDuration = 0;
+  Timer? _recordingTimer;
 
   Future<void> _startRecording() async {
     final hasPermission = await _checkPermissions();
@@ -27,7 +31,7 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
     final path =
         '${dir.path}/recorded_audio_${DateTime.now().millisecondsSinceEpoch}.wav';
 
-    await record.start(
+    await _audioRecorder.start(
       const RecordConfig(
         encoder: AudioEncoder.wav,
         bitRate: 128000,
@@ -36,43 +40,86 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
       path: path,
     );
 
+    _startTimer();
+
     setState(() {
-      isRecording = true;
-      recordedFilePath = path;
-      isRecorded = false;
+      _isRecording = true;
+      _recordedFilePath = path;
+      _isRecorded = false;
+    });
+  }
+
+  void _startTimer() {
+    _recordingTimer?.cancel();
+    _recordingDuration = 0;
+    _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _recordingDuration++;
+      });
     });
   }
 
   Future<void> _stopRecording() async {
-    await record.stop();
+    await _audioRecorder.stop();
+    _recordingTimer?.cancel();
+    _recordingTimer = null;
+
     setState(() {
-      isRecording = false;
-      isRecorded = true;
+      _isRecording = false;
+      _isRecorded = true;
     });
   }
 
   Future<bool> _checkPermissions() async {
     final micStatus = await Permission.microphone.request();
-    return micStatus.isGranted;
+    if (!micStatus.isGranted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Microphone permission is required to record audio'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+    return true;
   }
 
   void _deleteAudio() {
+    _recordingTimer?.cancel(); // Clean up timer if it exists
+    _recordingTimer = null;
+
     setState(() {
-      recordedFilePath = null;
-      isRecording = false;
-      isRecorded = false;
+      _recordedFilePath = null;
+      _isRecording = false;
+      _isRecorded = false;
+      _recordingDuration = 0;
     });
     context.read<HomeBloc>().add(ClearPickedAudio());
   }
 
+  String _formatDuration(int seconds) {
+    final minutes = (seconds / 60).floor().toString().padLeft(2, '0');
+    final remainingSeconds = (seconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$remainingSeconds';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final fileReady = recordedFilePath != null && isRecorded;
+    final fileReady = _recordedFilePath != null && _isRecorded;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Record Audio"),
+        title: Text(
+          "Record Audio",
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
         backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: BlocListener<HomeBloc, HomeState>(
         listener: (context, state) {
@@ -94,68 +141,145 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                duration: const Duration(seconds: 15),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 5),
               ),
             );
           }
         },
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (!isRecorded)
-                Icon(
-                  isRecording ? Icons.mic : Icons.mic_none,
-                  size: 100,
-                  color: isRecording ? Colors.red : Colors.grey,
-                ),
-              const SizedBox(height: 20),
-              if (!isRecorded)
-                ElevatedButton(
-                  onPressed: isRecording ? _stopRecording : _startRecording,
-                  child:
-                      Text(isRecording ? 'Stop Recording' : 'Start Recording'),
-                ),
-              if (isRecorded)
-                Column(
-                  children: [
-                    const Center(
-                      child: Text(
-                        "Audio recorded successfully ✅",
-                        style: TextStyle(
-                          fontSize: 26,
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (!_isRecorded)
+                  Column(
+                    children: [
+                      Icon(
+                        _isRecording ? Icons.mic : Icons.mic_none,
+                        size: 100,
+                        color:
+                            _isRecording ? Colors.green : AppTheme.primaryColor,
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.analytics),
-                          label: const Text("Analyze Audio"),
-                          onPressed: fileReady
-                              ? () {
-                                  context.read<HomeBloc>().add(
-                                        StartAnalysis(File(recordedFilePath!)),
-                                      );
-                                }
-                              : null,
+                      const SizedBox(height: 16),
+                      if (_isRecording)
+                        Text(
+                          _formatDuration(_recordingDuration),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(width: 12),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.delete),
-                          label: const Text("Delete"),
-                          onPressed: _deleteAudio,
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed:
+                              _isRecording ? _stopRecording : _startRecording,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _isRecording
+                                ? Colors.green
+                                : AppTheme.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            _isRecording ? 'STOP RECORDING' : 'START RECORDING',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-            ],
+                      ),
+                    ],
+                  ),
+                if (_isRecorded)
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.check_circle_outline_outlined,
+                        size: 80,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Recording Complete",
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                      Text(
+                        "Duration: ${_formatDuration(_recordingDuration)}",
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 32),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.analytics),
+                              label: Text(
+                                "ANALYZE",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: Colors.white),
+                              ),
+                              onPressed: fileReady
+                                  ? () {
+                                      context.read<HomeBloc>().add(
+                                            StartAnalysis(
+                                                File(_recordedFilePath!)),
+                                          );
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.secondaryColor,
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.delete),
+                              label: Text(
+                                "DELETE",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: Colors.white),
+                              ),
+                              onPressed: _deleteAudio,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -164,7 +288,8 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
 
   @override
   void dispose() {
-    record.dispose();
+    _recordingTimer?.cancel(); // Safe cancel with null check
+    _audioRecorder.dispose();
     super.dispose();
   }
 }

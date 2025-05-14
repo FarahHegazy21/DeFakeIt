@@ -66,15 +66,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
               const SizedBox(height: 30),
               const Text("Loading...", style: TextStyle(fontSize: 16)),
               const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3E3C6D),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text("Cancel"),
-              ),
             ],
           ),
         ),

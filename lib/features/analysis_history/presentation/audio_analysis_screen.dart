@@ -130,16 +130,16 @@ class AudioAnalysisScreen extends StatelessWidget {
                         confidence >= 0.8
                             ? "High"
                             : confidence >= 0.5
-                            ? "Medium"
-                            : "Low",
+                                ? "Medium"
+                                : "Low",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: confidence >= 0.8
                               ? Colors.green
                               : confidence >= 0.5
-                              ? Colors.orange
-                              : Colors.red,
+                                  ? Colors.orange
+                                  : Colors.red,
                         ),
                       ),
                     ],
@@ -147,7 +147,8 @@ class AudioAnalysisScreen extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     "Analyzed on $uploadDate",
-                    style: const TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
+                    style:
+                        const TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
                   ),
                   const SizedBox(height: 24),
                   const Align(
@@ -166,8 +167,8 @@ class AudioAnalysisScreen extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       notes,
-                      style:
-                      const TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
+                      style: const TextStyle(
+                          fontSize: 14, color: Color(0xFF1B1C20)),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -187,8 +188,8 @@ class AudioAnalysisScreen extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "$format, $size",
-                      style:
-                      const TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
+                      style: const TextStyle(
+                          fontSize: 14, color: Color(0xFF1B1C20)),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -208,8 +209,7 @@ class AudioAnalysisScreen extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "Uploaded via app.",
-                      style:
-                      TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
+                      style: TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -227,20 +227,20 @@ class AudioAnalysisScreen extends StatelessWidget {
                     children: [
                       InkWell(
                         onTap: () => _launchURL(facebookUrl),
-                        child: Image.asset('assets/images/fb_icon.png',
-                            width: 35),
+                        child:
+                            Image.asset('assets/images/fb_icon.png', width: 35),
                       ),
                       const SizedBox(width: 20),
                       InkWell(
                         onTap: () => _launchURL(instagramUrl),
-                        child: Image.asset('assets/images/ig_icon.png',
-                            width: 35),
+                        child:
+                            Image.asset('assets/images/ig_icon.png', width: 35),
                       ),
                       const SizedBox(width: 20),
                       InkWell(
                         onTap: () => _launchURL(twitterUrl),
-                        child: Image.asset('assets/images/X_icon.png',
-                            width: 35),
+                        child:
+                            Image.asset('assets/images/X_icon.png', width: 35),
                       ),
                     ],
                   ),
@@ -274,7 +274,7 @@ class GradientCircularPainter extends CustomPainter {
     final sweepAngle = 2 * 3.1416 * percent;
 
     final colors = isFake
-        ? [Colors.red.shade700,Colors.red.shade700]
+        ? [Colors.red.shade700, Colors.red.shade700]
         : [Colors.green.shade700, Colors.green.shade700];
 
     final gradient = SweepGradient(

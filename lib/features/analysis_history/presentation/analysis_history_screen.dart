@@ -46,7 +46,8 @@ class AnalysisHistoryScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   SectionList(title: "Previous 7 days", audios: recent7Days),
                   const SizedBox(height: 20),
-                  SectionList(title: "Previous 30 days", audios: previous30Days),
+                  SectionList(
+                      title: "Previous 30 days", audios: previous30Days),
                 ],
               );
             } else if (state is HistoryError) {
@@ -96,7 +97,6 @@ class AudioListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // استخراج البيانات من الـ audio
     String audioName = audio['audio_name'] ?? 'Unknown';
     String uploadDate = audio['upload_date'] ?? '';
     String notes = audio['notes'] ?? 'No notes available';
@@ -107,7 +107,6 @@ class AudioListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        // الانتقال لصفحة AudioAnalysisScreen وتمرير البيانات
         Navigator.push(
           context,
           MaterialPageRoute(

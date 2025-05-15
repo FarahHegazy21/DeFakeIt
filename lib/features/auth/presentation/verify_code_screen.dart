@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import '../../../core/constant/APIs_constants.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // localization import
 
 class VerifyCodeScreen extends StatefulWidget {
   const VerifyCodeScreen({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class VerifyCodeScreen extends StatefulWidget {
 
 class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   final List<TextEditingController> _controllers =
-      List.generate(6, (index) => TextEditingController());
+  List.generate(6, (index) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
   final _storage = const FlutterSecureStorage();
   bool _isLoading = false;
@@ -59,9 +60,11 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   }
 
   Future<void> _verifyCode() async {
+    final local = AppLocalizations.of(context)!;
+
     if (_email == null || _email!.isEmpty) {
       setState(() {
-        _errorMessage = 'Session expired. Please start again.';
+        _errorMessage = local.sessionExpired;
       });
       return;
     }
@@ -69,7 +72,7 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
     final code = _controllers.map((c) => c.text).join();
     if (code.length != 6) {
       setState(() {
-        _errorMessage = 'Please enter the full 6-digit code';
+        _errorMessage = local.enterFullCode;
       });
       return;
     }
@@ -97,12 +100,12 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
         Navigator.pushNamed(context, '/createNewPassword');
       } else {
         setState(() {
-          _errorMessage = 'Invalid code. Please try again.';
+          _errorMessage = local.invalidCode;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Network error. Please try again.';
+        _errorMessage = local.networkError;
       });
     } finally {
       setState(() {
@@ -112,6 +115,8 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   }
 
   Future<void> _resendCode() async {
+    final local = AppLocalizations.of(context)!;
+
     if (_email == null || _email!.isEmpty || _remainingTime > 0) return;
 
     setState(() {
@@ -132,19 +137,19 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('New code sent successfully'),
-            duration: Duration(seconds: 3),
+          SnackBar(
+            content: Text(local.newCodeSent),
+            duration: const Duration(seconds: 3),
           ),
         );
       } else {
         setState(() {
-          _errorMessage = 'Failed to resend code. Try again later.';
+          _errorMessage = local.failedResendCode;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Network error. Please try again.';
+        _errorMessage = local.networkError;
       });
     } finally {
       setState(() {
@@ -167,15 +172,16 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
+
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
     ));
 
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned(
@@ -183,7 +189,9 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
             right: 0,
             left: 0,
             child: Image.asset(
-              "assets/images/background.png",
+              isDarkMode
+                  ? "assets/images/background_home_transparent.png"
+                  : "assets/images/background.png",
               fit: BoxFit.cover,
               color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),
@@ -206,7 +214,7 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Verify\n',
+                          text: '${local.verify}\n',
                           style: GoogleFonts.poppins(
                             color: Colors.grey[600],
                             fontWeight: FontWeight.w500,
@@ -215,19 +223,15 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: 'Account!',
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF1E2961),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 30,
-                          ),
+                          text: local.account,
+                          style: textTheme.displayMedium,
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 38),
                   Text(
-                    'Enter the 6-digit code sent to ${_email ?? 'your email'}',
+                    '${local.enterCodeSentTo} ${_email ?? local.yourEmail}',
                     style: GoogleFonts.poppins(
                       color: const Color(0xFF8F9193),
                       fontSize: 14,
@@ -283,18 +287,12 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                   Center(
                     child: TextButton(
                       onPressed:
-                          _remainingTime > 0 || _isLoading ? null : _resendCode,
+                      _remainingTime > 0 || _isLoading ? null : _resendCode,
                       child: Text(
                         _remainingTime > 0
-                            ? 'Resend code in $_remainingTime seconds'
-                            : 'Resend Code',
-                        style: GoogleFonts.poppins(
-                          color: _remainingTime > 0
-                              ? Colors.grey
-                              : const Color(0xFF1E2961),
-                          fontSize: 14,
-                          decoration: TextDecoration.underline,
-                        ),
+                            ? '${local.resendCodeIn} $_remainingTime ${local.seconds}'
+                            : local.resendCode,
+                        style: textTheme.bodyMedium,
                       ),
                     ),
                   ),
@@ -313,13 +311,13 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              'Verify',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                              ),
-                            ),
+                        local.verify,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   ),
                 ],

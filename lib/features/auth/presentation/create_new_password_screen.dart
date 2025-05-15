@@ -104,7 +104,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
         // Navigate to success screen or login screen
         Navigator.pushNamedAndRemoveUntil(
-            context, '/doneChangePass', (route) => false);
+            context, '/passwordResetSuccess', (route) => false);
       } else {
         setState(() {
           _errorMessage = responseData['message'] ?? 'Failed to reset password';
@@ -129,7 +129,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background.png',
+              'assets/images/Background.png',
               fit: BoxFit.cover,
               color: Colors.white.withOpacity(0.97),
               colorBlendMode: BlendMode.lighten,

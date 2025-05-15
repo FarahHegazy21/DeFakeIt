@@ -94,16 +94,19 @@ class DetectionResultScreen extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      "Confidence Level:",
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      "Confidence Level: $confidenceLevel",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: color),
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "$confidenceLevel",
+                      "$confidencePercentage%",
                       style: Theme.of(context)
                           .textTheme
                           .bodyLarge
-                          ?.copyWith(color: color, fontWeight: FontWeight.bold),
+                          ?.copyWith(color: color),
                     ),
                   ],
                 ),
@@ -114,6 +117,7 @@ class DetectionResultScreen extends StatelessWidget {
                   style: const TextStyle(fontSize: 15),
                 ),
                 const SizedBox(height: 30),
+                // أزرار Feedback و Cancel في صف واحد
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -134,8 +138,8 @@ class DetectionResultScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
-                      onPressed: () =>
-                          Navigator.pushReplacementNamed(context, '/home'),
+                      onPressed: () => Navigator.popUntil(
+                          context, (route) => route.settings.name == '/home'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.secondaryColor,
                         shape: RoundedRectangleBorder(
@@ -252,19 +256,11 @@ class DetectionResultScreen extends StatelessWidget {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Row(
-                          children: [
-                            Icon(success ? Icons.check : Icons.error,
-                                color: Colors.white),
-                            SizedBox(width: 8),
-                            Text(
-                              success
-                                  ? "Feedback submitted successfully"
-                                  : "Failed to submit feedback",
-                            ),
-                          ],
+                        content: Text(
+                          success
+                              ? "Feedback submitted successfully"
+                              : "Failed to submit feedback",
                         ),
-                        backgroundColor: success ? Colors.green : Colors.red,
                       ),
                     );
                   },

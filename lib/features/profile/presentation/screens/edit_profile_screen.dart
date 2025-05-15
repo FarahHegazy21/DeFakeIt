@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/APIs/post_update_user.dart';
-import '../../../auth/logic/auth_bloc.dart';
-import '../../../auth/logic/auth_event.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String initialUsername;
@@ -66,12 +63,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ]);
 
         _showSuccess('Profile updated successfully');
-
-        context.read<AuthBloc>().add(UpdateUserRequested(
-              username: _usernameController.text,
-              email: _emailController.text,
-            ));
-
         if (mounted) Navigator.pop(context, true);
       } else {
         throw Exception('Failed to update profile');

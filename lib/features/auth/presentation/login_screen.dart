@@ -1,6 +1,7 @@
 import 'package:defakeit/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // استيراد الترجمة
 import '../logic/auth_bloc.dart';
 import '../logic/auth_event.dart';
 import '../logic/auth_state.dart';
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!; // الوصول لترجمات الشاشة
 
     return Scaffold(
       body: Stack(
@@ -30,9 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 0,
             left: 0,
             child: Image.asset(
-              "assets/images/background.png",
+              isDarkMode ? "assets/images/background_home_transparent.png" : "assets/images/background.png",
               fit: BoxFit.cover,
-              color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),
           ),
           SafeArea(
@@ -44,37 +45,33 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Welcome",
-                        style:
-                            Theme.of(context).textTheme.displayLarge?.copyWith(
-                                  color: Color(0xFFA4A3A3),
-                                  fontSize: 42,
-                                ),
+                        loc.welcome,
+                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                          color: const Color(0xFFA4A3A3),
+                          fontSize: 42,
+                        ),
                       ),
                       Text(
-                        "Back!",
-                        style:
-                            Theme.of(context).textTheme.displayLarge?.copyWith(
-                                  fontSize: 36,
-                                ),
+                        loc.back,
+                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                          fontSize: 36,
+                        ),
                       ),
                       const SizedBox(height: 65),
                       TextField(
                         controller: emailController,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Color(0xFFA4A3A3),
-                            ),
+                          color: const Color(0xFFA4A3A3),
+                        ),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.email_outlined),
-                          hintText: 'Email Address',
-                          hintStyle:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Color(0xFFA4A3A3),
-                                  ),
+                          hintText: loc.emailAddress,
+                          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: const Color(0xFFA4A3A3),
+                          ),
                           filled: true,
-                          fillColor: Color(0xFFF4F4F4),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 18),
+                          fillColor: const Color(0xFFF4F4F4),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -85,29 +82,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextField(
                         controller: passwordController,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Color(0xFFA4A3A3),
-                            ),
+                          color: const Color(0xFFA4A3A3),
+                        ),
                         obscureText: !isPasswordVisible,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock_outline),
-                          hintText: 'Password',
-                          hintStyle:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Color(0xFFA4A3A3),
-                                  ),
+                          hintText: loc.password,
+                          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: const Color(0xFFA4A3A3),
+                          ),
                           filled: true,
-                          fillColor: Color(0xFFF4F4F4),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 18),
+                          fillColor: const Color(0xFFF4F4F4),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              isPasswordVisible
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
+                              isPasswordVisible ? Icons.visibility_off : Icons.visibility,
                             ),
                             onPressed: () {
                               setState(() {
@@ -129,13 +122,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),
                           Text(
-                            'Remember Me',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: Color(0xFFA4A3A3),
-                                ),
+                            loc.rememberMe,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFFA4A3A3),
+                            ),
                           ),
                         ],
                       ),
@@ -146,8 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           listener: (context, state) {
                             if (state is Authenticated) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Login successful!"),
+                                SnackBar(
+                                  content: Text(loc.loginSuccessful),
                                   backgroundColor: Colors.green,
                                 ),
                               );
@@ -164,38 +154,33 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           builder: (context, state) {
                             if (state is AuthLoading) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
+                              return const Center(child: CircularProgressIndicator());
                             }
                             return ElevatedButton(
                               onPressed: () {
                                 final email = emailController.text.trim();
                                 final password = passwordController.text.trim();
                                 context.read<AuthBloc>().add(LoginRequested(
-                                      email: email,
-                                      password: password,
-                                      rememberMe: rememberMe,
-                                    ));
+                                  email: email,
+                                  password: password,
+                                  rememberMe: rememberMe,
+                                ));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
-                                minimumSize: Size(80, 20),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 14),
+                                minimumSize: const Size(80, 20),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: Text(
-                                'Log in',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
+                                loc.logIn,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
                             );
                           },
@@ -208,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.pushNamed(context, '/forgotPassword');
                           },
                           child: Text(
-                            'Forget password?',
+                            loc.forgetPassword,
                             style: TextStyle(
                               decoration: TextDecoration.underline,
                               color: AppTheme.textColorLightDarkBlue,
@@ -220,13 +205,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don’t have an account?"),
+                          Text(loc.dontHaveAccount),
                           TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/signup');
                             },
                             child: Text(
-                              'Sign Up',
+                              loc.signUp,
                               style: TextStyle(
                                 decoration: TextDecoration.underline,
                                 color: AppTheme.textColorLightDarkBlue,

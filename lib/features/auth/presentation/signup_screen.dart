@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../core/theme/theme.dart';
 import '../logic/auth_bloc.dart';
 import '../logic/auth_event.dart';
@@ -20,6 +21,9 @@ class _SignUpScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -28,7 +32,9 @@ class _SignUpScreenState extends State<SignupScreen> {
             right: 0,
             left: 0,
             child: Image.asset(
-              "assets/images/background.png",
+              isDarkMode
+                  ? "assets/images/background_home_transparent.png"
+                  : "assets/images/background.png",
               fit: BoxFit.cover,
             ),
           ),
@@ -41,26 +47,22 @@ class _SignUpScreenState extends State<SignupScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Create Account",
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                              color: Color(0xFFA4A3A3),
-                              fontSize: 42,
-                            ),
+                        local.createAccount,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: const Color(0xFFA4A3A3),
+                          fontSize: 42,
+                        ),
                       ),
                       const SizedBox(height: 65),
                       TextField(
                         controller: usernameController,
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.person_outline),
-                          hintText: 'Username',
+                          hintText: local.username,
                           filled: true,
                           fillColor: Colors.grey[100],
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -71,14 +73,13 @@ class _SignUpScreenState extends State<SignupScreen> {
                       TextField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.email_outlined),
-                          hintText: 'Email Address',
+                          hintText: local.email,
                           filled: true,
                           fillColor: Colors.grey[100],
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -89,14 +90,13 @@ class _SignUpScreenState extends State<SignupScreen> {
                       TextField(
                         controller: passwordController,
                         obscureText: true,
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock_outline),
-                          hintText: 'Password',
+                          hintText: local.password,
                           filled: true,
                           fillColor: Colors.grey[100],
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -115,13 +115,10 @@ class _SignUpScreenState extends State<SignupScreen> {
                             },
                           ),
                           Text(
-                            'Remember Me',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: Color(0xFFA4A3A3),
-                                ),
+                            local.rememberMe,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFFA4A3A3),
+                            ),
                           ),
                         ],
                       ),
@@ -132,8 +129,8 @@ class _SignUpScreenState extends State<SignupScreen> {
                           listener: (context, state) {
                             if (state is Authenticated) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Registration successful!"),
+                                SnackBar(
+                                  content: Text(local.registrationSuccess),
                                   backgroundColor: Colors.green,
                                 ),
                               );
@@ -150,8 +147,7 @@ class _SignUpScreenState extends State<SignupScreen> {
                           },
                           builder: (context, state) {
                             if (state is AuthLoading) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
+                              return const Center(child: CircularProgressIndicator());
                             }
                             return ElevatedButton(
                               onPressed: () {
@@ -159,31 +155,27 @@ class _SignUpScreenState extends State<SignupScreen> {
                                 final email = emailController.text.trim();
                                 final password = passwordController.text.trim();
                                 context.read<AuthBloc>().add(SignUpRequested(
-                                      username: username,
-                                      email: email,
-                                      password: password,
-                                      rememberMe: rememberMe,
-                                    ));
+                                  username: username,
+                                  email: email,
+                                  password: password,
+                                  rememberMe: rememberMe,
+                                ));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
-                                minimumSize: Size(80, 20),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 14),
+                                minimumSize: const Size(80, 20),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: Text(
-                                'Sign Up',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
+                                local.signUp,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
                             );
                           },
@@ -193,13 +185,13 @@ class _SignUpScreenState extends State<SignupScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have an account?"),
+                          Text(local.alreadyHaveAccount),
                           TextButton(
                             onPressed: () {
                               Navigator.pushReplacementNamed(context, '/login');
                             },
                             child: Text(
-                              'Log In',
+                              local.login,
                               style: TextStyle(
                                 decoration: TextDecoration.underline,
                                 color: AppTheme.textColorLightDarkBlue,

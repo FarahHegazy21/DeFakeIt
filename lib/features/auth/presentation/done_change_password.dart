@@ -7,8 +7,8 @@ class DoneChangePassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Stack(
         children: [
           // Background pattern (subtle wavy lines)
@@ -17,7 +17,9 @@ class DoneChangePassword extends StatelessWidget {
             right: 0,
             left: 0,
             child: Image.asset(
-              "assets/images/background.png",
+              isDarkMode
+                  ? "assets/images/background_home_transparent.png"
+                  : "assets/images/background.png",
               fit: BoxFit.cover,
               color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),
@@ -71,11 +73,7 @@ class DoneChangePassword extends StatelessWidget {
                   // "Password Changed" text
                   Text(
                     'Password Changed',
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF1C2A68),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
-                    ),
+                    style:textTheme.displayLarge,
                   ),
                   const SizedBox(height: 6),
                   // "Password Changed Successfully" text

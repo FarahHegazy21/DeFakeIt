@@ -21,6 +21,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignUpRequested>(_onSignUpRequested);
     on<GetHistoryRequested>(_onGetHistoryRequested);
     on<UpdateUserRequested>(_onUpdateUserRequested);
+    on<DeleteAudioRequested>(_onDeleteAudioRequested);
+    on<SaveAnalysisRequested>(_onSaveAnalysisRequested);
+    on<ChangePasswordRequested>(_onChangePasswordRequested);
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
@@ -112,7 +115,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         final List<Map<String, dynamic>> history =
-            data.cast<Map<String, dynamic>>();
+        data.cast<Map<String, dynamic>>();
         emit(HistoryLoaded(history: history));
       } else if (response.statusCode == 401) {
         await _storage.deleteAll();
@@ -160,6 +163,118 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else {
         emit(AuthError('Update error: ${e.toString()}'));
       }
+    }
+  }
+
+  Future<void> _onDeleteAudioRequested(
+      DeleteAudioRequested event, Emitter<AuthState> emit) async {
+    emit(HistoryLoading());
+    try {
+      final token = await _storage.read(key: 'token');
+      if (token == null) {
+        emit(HistoryError(message: 'Token not found.'));
+        return;
+      }
+
+      final response = await http.delete(
+        Uri.parse('${APIsConstants.baseURL}/delete_history/${event.audioId}'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final historyResponse = await http.get(
+          Uri.parse('${APIsConstants.baseURL}/history'),
+          headers: {'Authorization': 'Bearer $token'},
+        );
+        if (historyResponse.statusCode == 200) {
+          final List<dynamic> data = jsonDecode(historyResponse.body);
+          final List<Map<String, dynamic>> history =
+          data.cast<Map<String, dynamic>>();
+          emit(HistoryLoaded(history: history));
+        } else {
+          emit(HistoryError(message: 'Failed to load history: ${historyResponse.body}'));
+        }
+      } else {
+        emit(HistoryError(message: 'Failed to delete audio: ${response.body}'));
+      }
+    } catch (e) {
+      emit(HistoryError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onSaveAnalysisRequested(
+      SaveAnalysisRequested event, Emitter<AuthState> emit) async {
+    emit(HistoryLoading());
+    try {
+      final token = await _storage.read(key: 'token');
+      if (token == null) {
+        emit(HistoryError(message: 'Token not found.'));
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('${APIsConstants.baseURL}/history'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'audio_id':event.audioId,
+          'audio_name': event.audioName,
+          'is_fake': event.isFake,
+          'confidence': event.confidence,
+          'upload_date': event.uploadDate,
+          'notes': event.notes,
+          'format': event.format,
+          'size': event.size,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        add(GetHistoryRequested());
+      } else {
+        emit(HistoryError(message: 'Failed to save analysis: ${response.body}'));
+      }
+    } catch (e) {
+      emit(HistoryError(message: e.toString()));
+    }
+  }
+
+
+  Future<void> _onChangePasswordRequested(
+      ChangePasswordRequested event,
+      Emitter<AuthState> emit,
+      ) async {
+    emit(ChangePasswordLoading());
+
+    try {
+      final token = await _storage.read(key: 'token');
+
+      if (token == null) {
+        emit(ChangePasswordFailure(error: 'Session expired. Please log in again.'));
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('${APIsConstants.baseURL}/reset_password'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // If your API requires Bearer token auth
+        },
+        body: jsonEncode({
+          'reset_token': token,
+          'new_password': event.newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        emit(ChangePasswordSuccess(message: 'Password updated successfully'));
+      } else {
+        final data = jsonDecode(response.body);
+        emit(ChangePasswordFailure(error: data['message'] ?? 'Failed to update password'));
+      }
+    } catch (e) {
+      emit(ChangePasswordFailure(error: e.toString()));
     }
   }
 }

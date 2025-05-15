@@ -34,6 +34,21 @@ class HistoryError extends AuthState {
   HistoryError({required this.message});
 }
 
+class AnalysisSaved extends AuthState {}
+
+
+class ChangePasswordLoading extends AuthState {}
+
+class ChangePasswordSuccess extends AuthState {
+  final String message;
+  ChangePasswordSuccess({required this.message});
+}
+
+class ChangePasswordFailure extends AuthState {
+  final String error;
+  ChangePasswordFailure({required this.error});
+}
+
 class UserUpdatedState extends AuthState {
   final String username;
   final String email;

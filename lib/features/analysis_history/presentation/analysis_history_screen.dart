@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../auth/logic/auth_bloc.dart';
 import '../../auth/logic/auth_event.dart';
 import '../../auth/logic/auth_state.dart';
@@ -34,9 +35,9 @@ class AnalysisHistoryScreen extends StatelessWidget {
               return ListView(
                 children: [
                   const SizedBox(height: 20),
-                  const Text(
-                    "Analysis History",
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.analysisHistory,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
@@ -44,16 +45,27 @@ class AnalysisHistoryScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-                  SectionList(title: "Previous 7 days", audios: recent7Days),
+                  SectionList(
+                    title: AppLocalizations.of(context)!.previous7days,
+                    audios: recent7Days,
+                  ),
                   const SizedBox(height: 20),
                   SectionList(
-                      title: "Previous 30 days", audios: previous30Days),
+                    title: AppLocalizations.of(context)!.previous30days,
+                    audios: previous30Days,
+                  ),
                 ],
               );
             } else if (state is HistoryError) {
-              return Center(child: Text("Error: ${state.message}"));
+              return Center(
+                child: Text(
+                  "${AppLocalizations.of(context)!.error}: ${state.message}",
+                ),
+              );
             } else {
-              return const Center(child: Text("No data available"));
+              return Center(
+                child: Text(AppLocalizations.of(context)!.noDataAvailable),
+              );
             }
           },
         ),
@@ -71,7 +83,7 @@ class SectionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (audios.isEmpty) {
-      return Text("No audios in $title");
+      return Text(AppLocalizations.of(context)!.noAudiosIn(title));
     }
 
     return Column(
@@ -81,7 +93,10 @@ class SectionList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            TextButton(onPressed: () {}, child: const Text("Delete All")),
+            TextButton(
+              onPressed: () {},
+              child: Text(AppLocalizations.of(context)!.deleteAll),
+            ),
           ],
         ),
         ...audios.map((audio) => AudioListItem(audio: audio)).toList(),
@@ -104,6 +119,7 @@ class AudioListItem extends StatelessWidget {
     double confidence = audio['confidence'] ?? 0.0;
     double size = audio['size'] ?? 0.0;
     bool isFake = audio['is_fake'] ?? false;
+    int audioId = audio['audio_id'] ?? '';
 
     return InkWell(
       onTap: () {
@@ -130,14 +146,23 @@ class AudioListItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isFake ? 'Fake' : 'Real',
+              isFake
+                  ? AppLocalizations.of(context)!.fake
+                  : AppLocalizations.of(context)!.real,
               style: TextStyle(
                 color: isFake ? Colors.red : Colors.green,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(width: 10),
-            const Icon(Icons.delete_outline, color: Colors.grey),
+            IconButton(
+              onPressed: () {
+                context
+                    .read<AuthBloc>()
+                    .add(DeleteAudioRequested(audioId: audioId));
+              },
+              icon: const Icon(Icons.delete_outline, color: Colors.grey),
+            ),
           ],
         ),
       ),

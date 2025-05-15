@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../core/theme/theme.dart';
 
 class AudioAnalysisScreen extends StatelessWidget {
@@ -37,6 +37,8 @@ class AudioAnalysisScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Stack(
@@ -46,9 +48,8 @@ class AudioAnalysisScreen extends StatelessWidget {
             right: 0,
             left: 0,
             child: Image.asset(
-              "assets/images/background.png",
+              isDarkMode ? "assets/images/background_home_transparent.png" : "assets/images/background.png",
               fit: BoxFit.cover,
-              color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),
           ),
           SafeArea(
@@ -63,17 +64,13 @@ class AudioAnalysisScreen extends StatelessWidget {
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: Icon(Icons.arrow_back_ios_new,
-                            color: AppTheme.secondaryColor),
+                            color: isDarkMode ?AppTheme.textColorLightWhite : AppTheme.secondaryColor),
                       ),
                       Expanded(
                         child: Center(
                           child: Text(
                             audioName,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.secondaryColor,
-                            ),
+                            style: textTheme.displayMedium,
                           ),
                         ),
                       ),
@@ -102,7 +99,7 @@ class AudioAnalysisScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              isFake ? "Fake" : "Real",
+                              isFake ? loc.fake : loc.real,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: isFake ? Colors.red : Colors.green,
@@ -117,49 +114,40 @@ class AudioAnalysisScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Confidence Level:",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1B1C20),
-                        ),
+                      Text(
+                        loc.confidenceLevel,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         confidence >= 0.8
-                            ? "High"
+                            ? loc.high
                             : confidence >= 0.5
-                                ? "Medium"
-                                : "Low",
+                            ? loc.medium
+                            : loc.low,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: confidence >= 0.8
                               ? Colors.green
                               : confidence >= 0.5
-                                  ? Colors.orange
-                                  : Colors.red,
+                              ? Colors.orange
+                              : Colors.red,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Analyzed on $uploadDate",
-                    style:
-                        const TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
+                    loc.analyzedOn(uploadDate),
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 24),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Analysis Notes",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B1C20),
-                      ),
+                      loc.analysisNotes,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -167,20 +155,15 @@ class AudioAnalysisScreen extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       notes,
-                      style: const TextStyle(
-                          fontSize: 14, color: Color(0xFF1B1C20)),
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Format & Size",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B1C20),
-                      ),
+                      loc.formatAndSize,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -188,38 +171,29 @@ class AudioAnalysisScreen extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "$format, $size",
-                      style: const TextStyle(
-                          fontSize: 14, color: Color(0xFF1B1C20)),
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Source",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B1C20),
-                      ),
+                      loc.source,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Uploaded via app.",
-                      style: TextStyle(fontSize: 14, color: Color(0xFF1B1C20)),
+                      loc.uploadedViaApp,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                   const SizedBox(height: 30),
-                  const Text(
-                    "Share With",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1B1C20),
-                    ),
+                  Text(
+                    loc.shareWith,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -228,19 +202,19 @@ class AudioAnalysisScreen extends StatelessWidget {
                       InkWell(
                         onTap: () => _launchURL(facebookUrl),
                         child:
-                            Image.asset('assets/images/fb_icon.png', width: 35),
+                        Image.asset('assets/images/fb_icon.png', width: 35),
                       ),
                       const SizedBox(width: 20),
                       InkWell(
                         onTap: () => _launchURL(instagramUrl),
                         child:
-                            Image.asset('assets/images/ig_icon.png', width: 35),
+                        Image.asset('assets/images/ig_icon.png', width: 35),
                       ),
                       const SizedBox(width: 20),
                       InkWell(
                         onTap: () => _launchURL(twitterUrl),
                         child:
-                            Image.asset('assets/images/X_icon.png', width: 35),
+                        Image.asset('assets/images/X_icon.png', width: 35),
                       ),
                     ],
                   ),
@@ -280,7 +254,6 @@ class GradientCircularPainter extends CustomPainter {
     final gradient = SweepGradient(
       startAngle: 0.0,
       endAngle: 3.1416 * 2,
-      // stops: [0.0, percent * 0.7, percent],
       colors: colors,
     );
 

@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../core/constant/APIs_constants.dart';
 
 class CreateNewPasswordScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class CreateNewPasswordScreen extends StatefulWidget {
 class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  TextEditingController();
   final _storage = const FlutterSecureStorage();
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
@@ -47,9 +48,11 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   }
 
   Future<void> _resetPassword() async {
+    final loc = AppLocalizations.of(context)!;
+
     if (_resetToken == null || _resetToken!.isEmpty) {
       setState(() {
-        _errorMessage = 'Session expired. Please try again.';
+        _errorMessage = loc.sessionExpired;
       });
       return;
     }
@@ -59,21 +62,21 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
     if (newPassword.isEmpty || confirmPassword.isEmpty) {
       setState(() {
-        _errorMessage = 'Please fill in all fields';
+        _errorMessage = loc.fillAllFields;
       });
       return;
     }
 
     if (newPassword != confirmPassword) {
       setState(() {
-        _errorMessage = 'Passwords do not match';
+        _errorMessage = loc.passwordsNotMatch;
       });
       return;
     }
 
     if (newPassword.length < 6) {
       setState(() {
-        _errorMessage = 'Password must be at least 6 characters';
+        _errorMessage = loc.passwordMinLength;
       });
       return;
     }
@@ -85,8 +88,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse(
-            '${APIsConstants.baseURL}${APIsConstants.resetPasswordEndpoint}'),
+        Uri.parse('${APIsConstants.baseURL}${APIsConstants.resetPasswordEndpoint}'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'reset_token': _resetToken,
@@ -97,22 +99,19 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // Update password in secure storage
         await _storage.write(key: 'password', value: newPassword);
-        // Clear the reset token as it's no longer needed
         await _storage.delete(key: 'reset_token');
 
-        // Navigate to success screen or login screen
         Navigator.pushNamedAndRemoveUntil(
             context, '/doneChangePass', (route) => false);
       } else {
         setState(() {
-          _errorMessage = responseData['message'] ?? 'Failed to reset password';
+          _errorMessage = responseData['message'] ?? loc.resetFailed;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Network error. Please try again.';
+        _errorMessage = loc.networkError;
       });
     } finally {
       setState(() {
@@ -123,16 +122,20 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background.png',
+              isDarkMode
+                  ? "assets/images/background_home_transparent.png"
+                  : "assets/images/background.png",
+
               fit: BoxFit.cover,
-              color: Colors.white.withOpacity(0.97),
-              colorBlendMode: BlendMode.lighten,
             ),
           ),
           SafeArea(
@@ -158,7 +161,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                   ),
                   const SizedBox(height: 40),
                   Text(
-                    'Create',
+                    loc.create,
                     style: GoogleFonts.poppins(
                       color: const Color(0xFF8F9193),
                       fontWeight: FontWeight.w500,
@@ -166,17 +169,13 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                     ),
                   ),
                   Text(
-                    'New Password',
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF1F2B6C),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 32,
-                    ),
+                    loc.newPassword,
+                    style: textTheme.displayMedium,
                   ),
                   const SizedBox(height: 40),
                   _buildPasswordField(
                     controller: _passwordController,
-                    hint: 'New Password',
+                    hint: loc.newPasswordHint,
                     isVisible: _passwordVisible,
                     onToggleVisibility: () {
                       setState(() {
@@ -187,7 +186,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                   const SizedBox(height: 16),
                   _buildPasswordField(
                     controller: _confirmPasswordController,
-                    hint: 'Confirm Password',
+                    hint: loc.confirmPasswordHint,
                     isVisible: _confirmPasswordVisible,
                     onToggleVisibility: () {
                       setState(() {
@@ -220,13 +219,13 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              'Save',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
+                        loc.save,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                 ],

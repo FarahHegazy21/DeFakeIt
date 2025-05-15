@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../../../core/theme/theme.dart';
 import '../../../../core/APIs/post_update_user.dart';
 import '../../../auth/logic/auth_bloc.dart';
@@ -37,7 +39,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   bool get _hasChanges =>
       _usernameController.text != widget.initialUsername ||
-      _emailController.text != widget.initialEmail;
+          _emailController.text != widget.initialEmail;
 
   Future<void> _saveUserData() async {
     if (!_formKey.currentState!.validate()) return;
@@ -65,16 +67,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _storage.write(key: 'token', value: newToken),
         ]);
 
-        _showSuccess('Profile updated successfully');
+        _showSuccess(AppLocalizations.of(context)!.profileUpdated);
 
         context.read<AuthBloc>().add(UpdateUserRequested(
-              username: _usernameController.text,
-              email: _emailController.text,
-            ));
+          username: _usernameController.text,
+          email: _emailController.text,
+        ));
 
         if (mounted) Navigator.pop(context, true);
       } else {
-        throw Exception('Failed to update profile');
+        throw Exception(AppLocalizations.of(context)!.failedToUpdateProfile);
       }
     } on Exception catch (e) {
       if (e.toString().contains("No token found")) {
@@ -83,13 +85,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Navigator.pop(context); // Return to previous screen
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Session expired. Please log in again.'),
+              content: Text(AppLocalizations.of(context)!.sessionExpired),
               backgroundColor: Colors.red,
             ),
           );
         }
       } else {
-        _showError('Failed to update profile: ${e.toString()}');
+        _showError(
+            '${AppLocalizations.of(context)!.failedToUpdateProfile}: ${e.toString()}');
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -121,6 +124,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: Stack(
         children: [
@@ -131,7 +137,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             height: 400,
             child: Container(
               decoration: BoxDecoration(
-                color: AppTheme.primaryColor,
+                color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.primaryColor,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(60),
                   bottomRight: Radius.circular(60),
@@ -159,7 +165,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    color: AppTheme.backgroundLight,
+                    color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.backgroundLight,
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Form(
@@ -167,14 +173,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         child: Column(
                           children: [
                             Text(
-                              'Edit Profile',
+                              loc.editProfile,
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineMedium
                                   ?.copyWith(
-                                    color: AppTheme.textColorLightDarkBlue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                color: isDarkMode ? AppTheme.textColorLightWhite : AppTheme.textColorLightDarkBlue,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 30),
                             if (_errorMessage != null) ...[
@@ -187,31 +193,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             TextFormField(
                               controller: _emailController,
                               decoration: InputDecoration(
-                                hintText: 'Email',
+                                hintText: loc.email,
                                 prefixIcon: Icon(Icons.email,
                                     color: AppTheme.primaryColor),
                                 hintStyle:
-                                    Theme.of(context).textTheme.bodyMedium,
+                                Theme.of(context).textTheme.bodyMedium,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
+                                  BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
+                                  BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 20),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter email';
+                                  return loc.pleaseEnterEmail;
                                 }
                                 if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                     .hasMatch(value)) {
-                                  return 'Enter valid email';
+                                  return loc.pleaseEnterValidEmail;
                                 }
                                 return null;
                               },
@@ -221,27 +227,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             TextFormField(
                               controller: _usernameController,
                               decoration: InputDecoration(
-                                hintText: 'Username',
+                                hintText: loc.username,
                                 hintStyle:
-                                    Theme.of(context).textTheme.bodyMedium,
+                                Theme.of(context).textTheme.bodyMedium,
                                 prefixIcon: Icon(Icons.person,
                                     color: AppTheme.primaryColor),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
+                                  BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
+                                  BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 20),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter username';
+                                  return loc.pleaseEnterUsername;
                                 }
                                 return null;
                               },
@@ -265,19 +271,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ),
                                 child: _isSaving
                                     ? const CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      )
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                )
                                     : Text(
-                                        'SAVE',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
+                                  loc.save,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ],

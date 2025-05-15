@@ -2,6 +2,7 @@ import 'package:defakeit/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';  // لازم تولد ملفات الترجمة
 import '../../../core/APIs/post_feedback.dart';
 
 class DetectionResultScreen extends StatelessWidget {
@@ -20,29 +21,36 @@ class DetectionResultScreen extends StatelessWidget {
     this.message,
   });
 
-  String _getConfidenceLevel() {
+  String _getConfidenceLevel(BuildContext context) {
     final percentage = confidence * 100;
-    if (percentage >= 75) return 'HIGH';
-    if (percentage <= 59) return 'LOW';
-    return 'NORMAL';
+    final loc = AppLocalizations.of(context)!;
+    if (percentage >= 75) return loc.high;
+    if (percentage <= 59) return loc.low;
+    return loc.normal;
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final confidencePercentage = (confidence * 100).toStringAsFixed(0);
     final color = isFake ? Colors.red : Colors.green;
-    final resultText = isFake ? "Fake" : "Real";
+
+    final loc = AppLocalizations.of(context)!;
+
+    final resultText = isFake ? loc.fake : loc.real;
     final description = isFake
-        ? "Detected unusual pitch changes. Likely AI-generated."
-        : "Authentic audio typically has natural patterns in pitch and tone.";
-    final confidenceLevel = _getConfidenceLevel();
+        ? loc.detectedUnusualPitchChanges
+        : loc.authenticAudioDescription;
+    final confidenceLevel = _getConfidenceLevel(context);
 
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Color(0xFFF5F5F5)],
+            colors: isDarkMode
+                ? [Colors.black, Colors.grey]
+                : [Colors.white, const Color(0xFFF5F5F5)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -52,24 +60,24 @@ class DetectionResultScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Detection Results",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  loc.detectionResults,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Audio: $audioName',
+                  '${loc.audio}: $audioName',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Uploaded: $uploadDate',
+                  '${loc.uploaded}: $uploadDate',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 if (message != null) ...[
                   const SizedBox(height: 10),
                   Text(
-                    'Message: $message',
+                    '${loc.message}: $message',
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 ],
@@ -94,12 +102,12 @@ class DetectionResultScreen extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      "Confidence Level:",
+                      '${loc.confidenceLevel}:',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "$confidenceLevel",
+                      confidenceLevel,
                       style: Theme.of(context)
                           .textTheme
                           .bodyLarge
@@ -127,9 +135,9 @@ class DetectionResultScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
                       ),
-                      child: const Text(
-                        "Feedback",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      child: Text(
+                        loc.feedback,
+                        style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),
                     const SizedBox(width: 20),
@@ -144,15 +152,15 @@ class DetectionResultScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
                       ),
-                      child: const Text(
-                        "Cancel",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      child: Text(
+                        loc.cancel,
+                        style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 30),
-                const Text("Share With"),
+                Text(loc.shareWith),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -189,39 +197,38 @@ class DetectionResultScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) {
+        final loc = AppLocalizations.of(ctx)!;
         return StatefulBuilder(
           builder: (ctx, setState) {
             return AlertDialog(
-              title: const Text("Send Feedback"),
+              title: Text(loc.sendFeedback),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
                       Radio<String>(
-                        value: "Good",
+                        value: loc.good,
                         groupValue: feedbackType,
-                        onChanged: (value) =>
-                            setState(() => feedbackType = value),
+                        onChanged: (value) => setState(() => feedbackType = value),
                       ),
-                      const Text("Good"),
+                      Text(loc.good),
                       const SizedBox(width: 20),
                       Radio<String>(
-                        value: "Issue",
+                        value: loc.issue,
                         groupValue: feedbackType,
-                        onChanged: (value) =>
-                            setState(() => feedbackType = value),
+                        onChanged: (value) => setState(() => feedbackType = value),
                       ),
-                      const Text("Issue"),
+                      Text(loc.issue),
                     ],
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: controller,
                     maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: "Your feedback",
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: loc.yourFeedback,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ],
@@ -229,15 +236,14 @@ class DetectionResultScreen extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text("Cancel"),
+                  child: Text(loc.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () async {
                     if (feedbackType == null || controller.text.isEmpty) {
                       ScaffoldMessenger.of(ctx).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text("Please select type and enter feedback"),
+                        SnackBar(
+                          content: Text(loc.pleaseSelectTypeAndEnterFeedback),
                         ),
                       );
                       return;
@@ -256,11 +262,11 @@ class DetectionResultScreen extends StatelessWidget {
                           children: [
                             Icon(success ? Icons.check : Icons.error,
                                 color: Colors.white),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
                               success
-                                  ? "Feedback submitted successfully"
-                                  : "Failed to submit feedback",
+                                  ? loc.feedbackSubmittedSuccessfully
+                                  : loc.failedToSubmitFeedback,
                             ),
                           ],
                         ),
@@ -268,7 +274,7 @@ class DetectionResultScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text("Submit"),
+                  child: Text(loc.submit),
                 ),
               ],
             );
@@ -287,7 +293,7 @@ class DetectionResultScreen extends StatelessWidget {
     String url;
     if (platform == 'facebook') {
       url =
-          "https://www.facebook.com/sharer/sharer.php?u=https://example.com=$message";
+      "https://www.facebook.com/sharer/sharer.php?u=https://example.com=$message";
     } else if (platform == 'instagram') {
       url = "https://www.instagram.com/?text=$message";
     } else {

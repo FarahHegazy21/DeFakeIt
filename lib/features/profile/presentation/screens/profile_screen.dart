@@ -94,11 +94,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircleAvatar(
+                         CircleAvatar(
                           radius: 60,
                           backgroundColor: Colors.white,
                           child: Icon(Icons.person,
-                            size: 110, color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.primaryColor,),
+                              size: 110, color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.primaryColor,),
                         ),
                         const SizedBox(height: 15),
                         Text(
@@ -149,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               title: local.totalAudios,
                               value: '${_userData['totalAudios']}',
                               icon: Icons.audio_file,
-                              color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.primaryColor,
+                                color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.primaryColor,
                             );
                           },
                         ),

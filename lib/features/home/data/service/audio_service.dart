@@ -9,7 +9,6 @@ import '../model/audio_result.dart';
 class AudioService {
   Future<AudioResult> uploadAudio(File audioFile, String token,
       {int retries = 3}) async {
-    const maxRetries = 3; // Define maxRetries here
     for (int attempt = 1; attempt <= retries; attempt++) {
       try {
         final url = Uri.parse(
@@ -33,55 +32,52 @@ class AudioService {
           final data = jsonDecode(response.body);
           return AudioResult.fromJson(data);
         } else if (response.statusCode == 401) {
-          debugPrint("❌ Invalid or expired token detected");
           throw InvalidTokenException('Invalid or expired token');
         } else {
           throw Exception(
               'API returned status code: ${response.statusCode} - ${response.body}');
         }
       } on http.ClientException catch (e) {
-        debugPrint("⚠️ ClientException occurred: $e");
-        if (e.message.contains('timeout') && attempt == maxRetries) {
+        if (attempt == retries && e.message.contains('timeout')) {
           throw ServerOfflineException('Server is offline or unreachable');
         }
         if (attempt == retries) rethrow;
       } catch (e) {
-        debugPrint("❌ Exception during API call: $e");
         if (attempt == retries) rethrow;
       }
-      await Future.delayed(
-          Duration(seconds: attempt * 2)); // Exponential backoff
+      await Future.delayed(Duration(seconds: attempt * 2));
     }
     throw Exception('Failed to upload audio after $retries attempts');
   }
 
   Future<List<Map<String, dynamic>>> getAudioHistory(String token) async {
-    try {
-      final url =
-          Uri.parse('${APIsConstants.baseURL}${APIsConstants.historyEndpoint}');
-      final response = await http.get(
-        url,
-        headers: {'Authorization': 'Bearer $token'},
-      );
+    final url =
+        Uri.parse('${APIsConstants.baseURL}${APIsConstants.historyEndpoint}');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
-      debugPrint("📩 API Status Code: ${response.statusCode}");
-      debugPrint("📦 API Response Body: ${response.body}");
+    debugPrint("📩 History API Status Code: ${response.statusCode}");
+    debugPrint("📦 History API Response Body: ${response.body}");
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as List;
-        return data.map((audio) => audio as Map<String, dynamic>).toList();
-      } else {
-        throw Exception(
-            'API returned status code: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      debugPrint("❌ Exception during API call: $e");
-      throw Exception('Failed to get audio history: $e');
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
+      return data.map((audio) => audio as Map<String, dynamic>).toList();
+    } else if (response.statusCode == 401) {
+      throw InvalidTokenException('Invalid or expired token');
+    } else if (response.statusCode >= 500) {
+      throw ServerOfflineException('Server error occurred');
+    } else {
+      throw Exception(
+          'Failed to get audio history: ${response.statusCode} - ${response.body}');
     }
   }
 }
 
-// Custom exceptions
 class InvalidTokenException implements Exception {
   final String message;
   InvalidTokenException(this.message);

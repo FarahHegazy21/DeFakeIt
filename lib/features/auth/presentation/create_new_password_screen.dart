@@ -134,6 +134,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
               isDarkMode
                   ? "assets/images/background_home_transparent.png"
                   : "assets/images/background.png",
+
               fit: BoxFit.cover,
             ),
           ),

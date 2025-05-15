@@ -38,3 +38,42 @@ class UpdateUserRequested extends AuthEvent {
   @override
   List<Object> get props => [username, email];
 }
+
+
+class DeleteAudioRequested extends AuthEvent {
+  final int audioId;
+
+  DeleteAudioRequested({required this.audioId});
+}
+
+class SaveAnalysisRequested extends AuthEvent {
+  final int  audioId ;
+  final String audioName;
+  final bool isFake;
+  final double confidence;
+  final String uploadDate;
+  final String notes;
+  final String format;
+  final double size;
+
+  SaveAnalysisRequested({
+    required this.audioId,
+    required this.audioName,
+    required this.isFake,
+    required this.confidence,
+    required this.uploadDate,
+    required this.notes,
+    required this.format,
+    required this.size,
+  });
+}
+
+class ChangePasswordRequested extends AuthEvent {
+  final String currentPassword;
+  final String newPassword;
+
+  ChangePasswordRequested({
+    required this.currentPassword,
+    required this.newPassword,
+  });
+}

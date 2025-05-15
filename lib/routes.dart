@@ -4,6 +4,7 @@ import 'package:defakeit/features/auth/presentation/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
 // Auth screens
+import 'features/auth/presentation/changePassword.dart';
 import 'features/auth/presentation/done_change_password.dart';
 import 'features/auth/presentation/forgot_password_screen.dart';
 import 'features/auth/presentation/login_screen.dart';
@@ -20,6 +21,7 @@ import 'features/home/presentation/record_audio_screen.dart';
 import 'features/analysis_history/presentation/analysis_history_screen.dart';
 import 'features/home/presentation/upload_audio_screen.dart';
 import 'features/profile/presentation/screens/profile_screen.dart';
+import 'features/settings/presentation/language.dart';
 import 'features/settings/presentation/settings_screen.dart';
 import 'nav_view.dart';
 
@@ -83,6 +85,24 @@ class AppRouter {
 
       case '/settings':
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
+
+      case '/NavView':
+        return MaterialPageRoute(builder: (_) => const NavView());
+
+      case '/ChangePasswordScreen':
+        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+
+      case '/language':
+        return MaterialPageRoute(builder: (_) => const LanguageScreen());
+
+      case '/welcome':
+        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+
+      case '/CreateNewPasswordScreen':
+        return MaterialPageRoute(builder: (_) => const CreateNewPasswordScreen());
+
+      case '/DoneChangePassword':
+        return MaterialPageRoute(builder: (_) => const DoneChangePassword());
 
       default:
         return MaterialPageRoute(

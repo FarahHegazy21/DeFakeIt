@@ -5,6 +5,8 @@ import 'package:defakeit/features/profile/presentation/screens/profile_screen.da
 import 'package:defakeit/features/settings/presentation/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class NavView extends StatefulWidget {
   const NavView({super.key});
@@ -34,9 +36,9 @@ class _NavViewState extends State<NavView> {
               right: 0,
               left: 0,
               child: Image.asset(
-                "assets/images/background.png",
+                isDarkMode ? "assets/images/background_home_transparent.png" : "assets/images/background.png",
                 fit: BoxFit.cover,
-                color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
+                //color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
               ),
             ),
           IndexedStack(
@@ -69,7 +71,7 @@ class _NavViewState extends State<NavView> {
             borderRadius: BorderRadius.circular(30),
             child: BottomNavigationBar(
               backgroundColor:
-                  Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+              Theme.of(context).bottomNavigationBarTheme.backgroundColor,
               currentIndex: _selectedIndex,
               onTap: (index) {
                 setState(() {
@@ -82,19 +84,19 @@ class _NavViewState extends State<NavView> {
               items: [
                 BottomNavigationBarItem(
                   icon: _buildNavIcon("assets/images/Home.png", 0),
-                  label: "Home",
+                  label: AppLocalizations.of(context)!.home,
                 ),
                 BottomNavigationBarItem(
                   icon: _buildNavIcon("assets/images/Analysis History.png", 1),
-                  label: "Analysis History",
+                  label: AppLocalizations.of(context)!.analysisHistory,
                 ),
                 BottomNavigationBarItem(
                   icon: _buildNavIcon("assets/images/profile.png", 2),
-                  label: "Profile",
+                  label: AppLocalizations.of(context)!.profile,
                 ),
                 BottomNavigationBarItem(
                   icon: _buildNavIcon("assets/images/Settings.png", 3),
-                  label: "Settings",
+                  label: AppLocalizations.of(context)!.settings,
                 ),
               ],
             ),

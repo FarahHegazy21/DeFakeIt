@@ -3,6 +3,7 @@ import 'package:defakeit/features/home/logic/home_bloc/home_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import localization
 import '../../../core/theme/theme.dart';
 
 class UploadAudioScreen extends StatelessWidget {
@@ -10,17 +11,19 @@ class UploadAudioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Upload Audio',
+          loc.uploadAudio,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -74,15 +77,15 @@ class UploadAudioScreen extends StatelessWidget {
                       Icon(
                         Icons.audiotrack,
                         size: 80,
-                        color: AppTheme.secondaryColor,
+                        color: AppTheme.primaryColor,
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Selected: ${state.fileName}',
+                        '${loc.selected}: ${state.fileName}',
                         style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -93,20 +96,20 @@ class UploadAudioScreen extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             context.read<HomeBloc>().add(
-                                  StartAnalysis(state.audioFile),
-                                );
+                              StartAnalysis(state.audioFile),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.secondaryColor,
+                            backgroundColor: AppTheme.primaryColor,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text(
-                            'Analyze Audio',
-                            style: TextStyle(fontSize: 16),
+                          child: Text(
+                            loc.analyzeAudio,
+                            style: const TextStyle(fontSize: 16),
                           ),
                         ),
                       ),
@@ -115,9 +118,9 @@ class UploadAudioScreen extends StatelessWidget {
                         width: double.infinity,
                         child: TextButton.icon(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          label: const Text(
-                            'Remove File',
-                            style: TextStyle(color: Colors.red),
+                          label: Text(
+                            loc.removeFile,
+                            style: const TextStyle(color: Colors.red),
                           ),
                           onPressed: () {
                             context.read<HomeBloc>().add(ClearPickedAudio());
@@ -141,7 +144,7 @@ class UploadAudioScreen extends StatelessWidget {
             if (state is ErrorState) {
               return Center(
                 child: Text(
-                  'Error: ${state.message}',
+                  '${loc.error}: ${state.message}',
                   style: const TextStyle(
                     color: Colors.red,
                     fontSize: 16,
@@ -161,11 +164,11 @@ class UploadAudioScreen extends StatelessWidget {
                     color: Colors.white,
                   ),
                   label: Text(
-                    'Upload Audio File',
+                    loc.uploadAudioFile,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryColor,
@@ -180,7 +183,7 @@ class UploadAudioScreen extends StatelessWidget {
                   ),
                   onPressed: () async {
                     FilePickerResult? result =
-                        await FilePicker.platform.pickFiles(
+                    await FilePicker.platform.pickFiles(
                       type: FileType.custom,
                       allowedExtensions: ['mp3', 'wav'],
                       allowMultiple: false,

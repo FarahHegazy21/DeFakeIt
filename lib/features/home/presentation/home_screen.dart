@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';  // استيراد ملف الترجمة
 import '../../auth/logic/auth_bloc.dart';
 import '../../auth/logic/auth_state.dart';
 import 'record_audio_screen.dart';
@@ -32,12 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print("Error loading username: $e");
+      debugPrint("Error loading username: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!; // اختصار الترجمة
+    final textTheme = Theme.of(context).textTheme;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is UserUpdatedState) {
@@ -55,11 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Hi, $_username",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
+                  "${loc.hi}, $_username",
+                  style: textTheme.bodyMedium,
                 ),
                 const Spacer(),
                 Center(
@@ -67,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const SizedBox(height: 140),
                       Text(
-                        "Ready to check\naudio authenticity?",
+                        loc.readyToCheckAudio,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.displayLarge,
                       ),
@@ -75,55 +76,59 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const UploadAudioScreen()),
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.file_upload,
-                              color: Color(0xFFA4A3A3),
-                            ),
-                            label: const Text("Upload File"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF4F4F4),
-                              foregroundColor: const Color(0xFFA4A3A3),
-                              textStyle: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                      const UploadAudioScreen()),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.file_upload,
+                                color: Color(0xFFA4A3A3),
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
+                              label: Text(loc.uploadFile),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFF4F4F4),
+                                foregroundColor: const Color(0xFFA4A3A3),
+                                textStyle: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 16),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const RecordAudioScreen()),
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.mic,
-                              color: Color(0xFFA4A3A3),
-                            ),
-                            label: const Text("Record"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF4F4F4),
-                              foregroundColor: const Color(0xFFA4A3A3),
-                              textStyle: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                      const RecordAudioScreen()),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.mic,
+                                color: Color(0xFFA4A3A3),
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 26, vertical: 12),
+                              label: Text(loc.record),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFF4F4F4),
+                                foregroundColor: const Color(0xFFA4A3A3),
+                                textStyle: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 26, vertical: 12),
+                              ),
                             ),
                           ),
                         ],

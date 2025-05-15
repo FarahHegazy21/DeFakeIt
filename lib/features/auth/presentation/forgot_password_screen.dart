@@ -5,6 +5,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Localization import
+
 import '../../../core/constant/APIs_constants.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -25,10 +27,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _sendVerificationCode() async {
+    final local = AppLocalizations.of(context)!;
     final email = _emailController.text.trim();
 
     if (!_isValidEmail(email)) {
-      setState(() => _infoMessage = 'Please enter a valid email address');
+      setState(() => _infoMessage = local.enterValidEmail);
       return;
     }
 
@@ -51,12 +54,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Navigator.pushNamed(context, '/verification');
       } else {
         setState(() {
-          _infoMessage =
-              'If this email is registered, you will receive a verification code shortly.';
+          _infoMessage = local.emailWillReceiveCode;
         });
       }
     } catch (e) {
-      setState(() => _infoMessage = 'Network error. Please try again.');
+      setState(() => _infoMessage = local.networkError);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -70,10 +72,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned(
@@ -81,7 +84,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             right: 0,
             left: 0,
             child: Image.asset(
-              "assets/images/background.png",
+              isDarkMode
+                  ? "assets/images/background_home_transparent.png"
+                  : "assets/images/background.png",
               fit: BoxFit.cover,
               color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),
@@ -104,7 +109,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Forgot\n',
+                          text: '${local.forgot}\n',
                           style: GoogleFonts.poppins(
                             color: const Color(0xFF8F9193),
                             fontWeight: FontWeight.w500,
@@ -113,19 +118,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: 'Password!',
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF1E2961),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 32,
-                          ),
+                          text: local.password,
+                          style: textTheme.displayMedium,
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Please Enter Your Email Address To Receive a Verification Code.',
+                    local.enterEmailToReceiveCode,
                     style: GoogleFonts.poppins(
                       color: const Color(0xFF8F9193),
                       fontSize: 13.5,
@@ -146,14 +147,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           color: Color(0xFFB0B0B0),
                           size: 20,
                         ),
-                        hintText: 'Email Address',
+                        hintText: local.emailAddress,
                         hintStyle: GoogleFonts.poppins(
                           color: const Color(0xFFB0B0B0),
                           fontSize: 14,
                         ),
                         border: InputBorder.none,
                         contentPadding:
-                            const EdgeInsets.symmetric(vertical: 16),
+                        const EdgeInsets.symmetric(vertical: 16),
+
+                      ),
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.black45 : Colors.white,  // تقدر كمان تتحكم في حجم الخط وغيره
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -180,13 +185,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              'Send',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
+                        local.send,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 36),
@@ -195,7 +200,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Go Back To? ',
+                          local.goBackTo,
                           style: GoogleFonts.poppins(
                             color: const Color(0xFF8F9193),
                             fontSize: 14,
@@ -204,13 +209,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         GestureDetector(
                           onTap: () => Navigator.pushNamed(context, '/signup'),
                           child: Text(
-                            'Sign In',
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xFF1E2961),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              decoration: TextDecoration.underline,
-                            ),
+                            local.signIn,
+                            style: textTheme.bodyMedium,
                           ),
                         ),
                       ],

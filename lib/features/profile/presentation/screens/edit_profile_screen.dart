@@ -39,8 +39,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   bool get _hasChanges =>
       _usernameController.text != widget.initialUsername ||
-          _emailController.text != widget.initialEmail;
+      _emailController.text != widget.initialEmail;
 
+  // HERE IS WHERE _saveUserData GOES
   Future<void> _saveUserData() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -55,45 +56,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     try {
-      final newToken = await updateUser(
+      final result = await updateUser(
         _usernameController.text,
         _emailController.text,
       );
 
-      if (newToken != null) {
+      print("UpdateUser Result: $result"); // Debug log
+
+      if (result['success'] == true && result['token'] != null) {
         await Future.wait([
           _storage.write(key: 'username', value: _usernameController.text),
           _storage.write(key: 'email', value: _emailController.text),
-          _storage.write(key: 'token', value: newToken),
+          _storage.write(key: 'token', value: result['token']),
         ]);
 
-        _showSuccess(AppLocalizations.of(context)!.profileUpdated);
+        _showSuccess(
+            result['message'] ?? AppLocalizations.of(context)!.profileUpdated);
 
         context.read<AuthBloc>().add(UpdateUserRequested(
-          username: _usernameController.text,
-          email: _emailController.text,
-        ));
+              username: _usernameController.text,
+              email: _emailController.text,
+            ));
 
         if (mounted) Navigator.pop(context, true);
       } else {
-        throw Exception(AppLocalizations.of(context)!.failedToUpdateProfile);
-      }
-    } on Exception catch (e) {
-      if (e.toString().contains("No token found")) {
-        await _storage.deleteAll();
-        if (mounted) {
-          Navigator.pop(context); // Return to previous screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.sessionExpired),
-              backgroundColor: Colors.red,
-            ),
-          );
+        if (result['message']?.contains("No token found") ?? false) {
+          await _storage.deleteAll();
+          if (mounted) {
+            Navigator.pop(context);
+            _showError(AppLocalizations.of(context)!.sessionExpired);
+          }
+        } else {
+          _showError(result['message'] ??
+              AppLocalizations.of(context)!.failedToUpdateProfile);
         }
-      } else {
-        _showError(
-            '${AppLocalizations.of(context)!.failedToUpdateProfile}: ${e.toString()}');
       }
+    } catch (e) {
+      _showError('${AppLocalizations.of(context)!.failedToUpdateProfile}: $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -102,31 +101,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _showError(String message) {
     if (!mounted) return;
     setState(() => _errorMessage = message);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   void _showSuccess(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final local = AppLocalizations.of(context)!;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Stack(
         children: [
@@ -137,7 +121,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             height: 400,
             child: Container(
               decoration: BoxDecoration(
-                color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.primaryColor,
+                color: isDarkMode
+                    ? AppTheme.textColorLightDarkBlue
+                    : AppTheme.primaryColor,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(60),
                   bottomRight: Radius.circular(60),
@@ -152,8 +138,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
-                    icon: Icon(Icons.arrow_back,
-                        color: AppTheme.textColorLightDarkBlue),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: _isSaving ? null : () => Navigator.pop(context),
                   ),
                 ),
@@ -165,7 +150,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    color: isDarkMode ? AppTheme.textColorLightDarkBlue : AppTheme.backgroundLight,
+                    color: isDarkMode
+                        ? AppTheme.backgroundDark
+                        : AppTheme.backgroundLight,
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Form(
@@ -178,9 +165,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   .textTheme
                                   .headlineMedium
                                   ?.copyWith(
-                                color: isDarkMode ? AppTheme.textColorLightWhite : AppTheme.textColorLightDarkBlue,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                    color: isDarkMode
+                                        ? AppTheme.textColorLightWhite
+                                        : AppTheme.textColorLightDarkBlue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             const SizedBox(height: 30),
                             if (_errorMessage != null) ...[
@@ -197,16 +186,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 prefixIcon: Icon(Icons.email,
                                     color: AppTheme.primaryColor),
                                 hintStyle:
-                                Theme.of(context).textTheme.bodyMedium,
+                                    Theme.of(context).textTheme.bodyMedium,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                  BorderSide(color: AppTheme.primaryColor),
+                                      BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                  BorderSide(color: AppTheme.primaryColor),
+                                      BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 20),
@@ -215,7 +204,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 if (value == null || value.isEmpty) {
                                   return loc.pleaseEnterEmail;
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
                                     .hasMatch(value)) {
                                   return loc.pleaseEnterValidEmail;
                                 }
@@ -229,18 +218,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               decoration: InputDecoration(
                                 hintText: loc.username,
                                 hintStyle:
-                                Theme.of(context).textTheme.bodyMedium,
+                                    Theme.of(context).textTheme.bodyMedium,
                                 prefixIcon: Icon(Icons.person,
                                     color: AppTheme.primaryColor),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                  BorderSide(color: AppTheme.primaryColor),
+                                      BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                  BorderSide(color: AppTheme.primaryColor),
+                                      BorderSide(color: AppTheme.primaryColor),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 20),
@@ -260,7 +249,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: ElevatedButton(
                                 onPressed: (_isSaving || !_hasChanges)
                                     ? null
-                                    : _saveUserData,
+                                    : _saveUserData, // Calls _saveUserData
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: _hasChanges
                                       ? AppTheme.primaryColor
@@ -271,19 +260,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ),
                                 child: _isSaving
                                     ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                )
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      )
                                     : Text(
-                                  loc.save,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                        loc.save,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
                               ),
                             ),
                           ],

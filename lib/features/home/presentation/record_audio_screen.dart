@@ -4,9 +4,9 @@ import 'package:defakeit/features/home/logic/home_bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../core/theme/theme.dart';
 
 class RecordAudioScreen extends StatefulWidget {
@@ -76,7 +76,8 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
     if (!micStatus.isGranted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.microphonePermissionRequired),
+          content:
+              Text(AppLocalizations.of(context)!.microphonePermissionRequired),
           backgroundColor: Colors.red,
         ),
       );
@@ -161,7 +162,8 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                       Icon(
                         _isRecording ? Icons.mic : Icons.mic_none,
                         size: 100,
-                        color: _isRecording ? Colors.green : AppTheme.primaryColor,
+                        color:
+                            _isRecording ? Colors.green : AppTheme.primaryColor,
                       ),
                       const SizedBox(height: 16),
                       if (_isRecording)
@@ -176,9 +178,12 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _isRecording ? _stopRecording : _startRecording,
+                          onPressed:
+                              _isRecording ? _stopRecording : _startRecording,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _isRecording ? Colors.green : AppTheme.primaryColor,
+                            backgroundColor: _isRecording
+                                ? Colors.green
+                                : AppTheme.primaryColor,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -186,7 +191,9 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                             ),
                           ),
                           child: Text(
-                            _isRecording ? loc.stopRecording : loc.startRecording,
+                            _isRecording
+                                ? loc.stopRecording
+                                : loc.startRecording,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -207,10 +214,11 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                       const SizedBox(height: 16),
                       Text(
                         loc.recordingComplete,
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       Text(
                         "${loc.duration}: ${_formatDuration(_recordingDuration)}",
@@ -231,15 +239,17 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                               ),
                               onPressed: fileReady
                                   ? () {
-                                context.read<HomeBloc>().add(
-                                  StartAnalysis(File(_recordedFilePath!)),
-                                );
-                              }
+                                      context.read<HomeBloc>().add(
+                                            StartAnalysis(
+                                                File(_recordedFilePath!)),
+                                          );
+                                    }
                                   : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.primaryColor,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -261,7 +271,8 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),

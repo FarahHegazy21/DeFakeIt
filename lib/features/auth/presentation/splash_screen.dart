@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../logic/auth_bloc.dart';
 import '../logic/auth_event.dart';
 import '../logic/auth_state.dart';
@@ -19,38 +19,38 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
   late Animation<double> _opacityAnimation;
+  bool _shouldNavigate = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Auth check
+    // Trigger auth check
     context.read<AuthBloc>().add(AppStarted());
 
-    // Animation setup
+    // Animation controller setup
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     );
 
-    // Scale animation: Start small, grow larger with bounce, then settle
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 0.7, end: 1.3), weight: 50),
-      TweenSequenceItem(tween: Tween<double>(begin: 1.3, end: 1.0), weight: 50),
-    ]).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOutBack,
-    ));
+    // Simplified scale animation to avoid TweenSequence issues
+    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutBack,
+      ),
+    );
 
-    // Rotation animation: Gentle 360-degree spin
-    _rotationAnimation = Tween<double>(begin: 0, end: 2 * 3.14159).animate(
+    // Rotation animation
+    _rotationAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeInOut,
       ),
     );
 
-    // Opacity for logo
+    // Opacity animation
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -65,6 +65,15 @@ class _SplashScreenState extends State<SplashScreen>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Widget _buildLogoSafe() {
+    return Image.asset(
+      'assets/images/defakeitt.png',
+      width: 200,
+      height: 200,
+      fit: BoxFit.contain,
+    );
   }
 
   @override
@@ -93,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Transform.rotate(
                   angle: _rotationAnimation.value,
                   child: Opacity(
-                    opacity: _opacityAnimation.value,
+                    opacity: _opacityAnimation.value.clamp(0.0, 1.0),
                     child: Container(
                       decoration: BoxDecoration(
                         boxShadow: [
@@ -105,12 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                         ],
                         shape: BoxShape.circle,
                       ),
-                      child: Image.asset(
-                        'assets/images/defakeitt.png',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.contain,
-                      ),
+                      child: _buildLogoSafe(),
                     ),
                   ),
                 ),

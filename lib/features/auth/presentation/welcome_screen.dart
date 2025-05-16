@@ -18,51 +18,76 @@ class WelcomeScreen extends StatelessWidget {
       statusBarBrightness: Brightness.light,
     ));
 
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
+    return PopScope(
+      canPop: false, // Disable back button navigation
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Stack(
           children: [
+            /// Wave background with curved white lines
             Positioned(
               top: 0,
-              right: 0,
               left: 0,
-              child: Image.asset(
-                isDarkMode
-                    ? "assets/images/background_home_transparent.png"
-                    : "assets/images/background.png",
-                fit: BoxFit.cover,
-              ),
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 32.0),
-                  child: Image.asset(
-                    'assets/images/defakeitt.png',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.contain,
+              right: 0,
+              child: ClipPath(
+                clipper: WaveClipper(),
+                child: CustomPaint(
+                  painter: CurvedLinesPainter(),
+                  child: Container(
+                    height: 380,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isDarkMode
+                            ? [Color(0xFF244F76), Color(0xFF244F76)]
+                            : [Color(0xFFd5e8ff), Color(0xFFf4f9ff)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 36),
+              ),
+            ),
+
+            /// Logo in center of blue part
+            Positioned(
+              top: 100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/defakeitt.png',
+                  width: 180,
+                  height: 180,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+
+            /// Main Content
+            Column(
+              children: [
+                const Spacer(flex: 5),
                 Text(
                   loc.letsGet,
-                  style: GoogleFonts.poppins(
+                  style: textTheme.displayLarge?.copyWith(
                     color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                    fontSize: 28,
+                    fontSize: 42,
                   ),
                 ),
                 Text(
                   loc.started,
-                  style: textTheme.displayMedium,
+                  style: textTheme.displayLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 42,
+                  ),
                 ),
-                const SizedBox(height: 38),
+                const Spacer(flex: 1),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
+                    width: 200,
+                    height: 45,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF233C7B),
@@ -76,10 +101,10 @@ class WelcomeScreen extends StatelessWidget {
                       },
                       child: Text(
                         loc.logIn,
-                        style: GoogleFonts.poppins(
+                        style: textTheme.bodyLarge?.copyWith(
                           color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -112,7 +137,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Spacer(),
+                const Spacer(flex: 2),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 36.0),
                   child: Column(
@@ -121,7 +146,7 @@ class WelcomeScreen extends StatelessWidget {
                         color: Color(0xFFB0B4BB),
                         thickness: 0.7,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -148,7 +173,7 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
@@ -184,4 +209,66 @@ class WelcomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Wavy blue background
+class WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 80);
+
+    final firstControlPoint = Offset(size.width / 4, size.height);
+    final firstEndPoint = Offset(size.width / 2, size.height - 60);
+    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+        firstEndPoint.dx, firstEndPoint.dy);
+
+    final secondControlPoint = Offset(3 * size.width / 4, size.height - 120);
+    final secondEndPoint = Offset(size.width, size.height - 80);
+    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
+        secondEndPoint.dx, secondEndPoint.dy);
+
+    path.lineTo(size.width, 0);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+/// Painter to draw curved white lines inside the blue wave
+class CurvedLinesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.2)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    for (int i = 0; i < 6; i++) {
+      final path = Path();
+      double shift = i * 30;
+
+      path.moveTo(0, shift.toDouble());
+      path.quadraticBezierTo(
+        size.width / 4,
+        shift + 20,
+        size.width / 2,
+        shift + 10,
+      );
+      path.quadraticBezierTo(
+        3 * size.width / 4,
+        shift,
+        size.width,
+        shift + 15,
+      );
+
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

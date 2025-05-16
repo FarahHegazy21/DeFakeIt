@@ -9,7 +9,7 @@ class AppTheme {
 
   // Define background colors for light and dark themes
   static const Color backgroundLight = Colors.white;
-  static const Color backgroundDark = Color(0xFF121212);
+  static const Color backgroundDark = Colors.black45;
 
   // Define bottom navigation background colors
   static const Color bottomNavLight = primaryColor;
@@ -49,22 +49,22 @@ class AppTheme {
   // Define custom text theme for light mode
   static const TextTheme textTheme = TextTheme(
     displayLarge: TextStyle(
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: FontWeight.bold,
         fontFamily: fontFamily,
         color: textColorLightDarkBlue),
     displayMedium: TextStyle(
-        fontSize: 18,
+        fontSize: 28,
         fontWeight: FontWeight.w600,
         fontFamily: fontFamily,
         color: textColorLightDarkBlue),
     bodyLarge: TextStyle(
-        fontSize: 24,
+        fontSize: 16,
         fontWeight: FontWeight.normal,
         fontFamily: fontFamily,
         color: textColorLightDarkBlue),
     bodyMedium: TextStyle(
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: FontWeight.normal,
         fontFamily: fontFamily,
         color: textColorLightDarkBlue),

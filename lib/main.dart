@@ -17,10 +17,13 @@ void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(create: (_) => HomeBloc(audioService: AudioService())),
-        BlocProvider<AuthBloc>(create: (_) => AuthBloc(userService: userService)..add(AppStarted())),
+        BlocProvider<HomeBloc>(
+            create: (_) => HomeBloc(audioService: AudioService())),
+        BlocProvider<AuthBloc>(
+            create: (_) =>
+                AuthBloc(userService: userService)..add(AppStarted())),
         BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
-        BlocProvider<LocaleBloc>(create: (_) => LocaleBloc()), // إضافة الـ LocaleBlo
+        BlocProvider<LocaleBloc>(create: (_) => LocaleBloc()),
       ],
       child: const MyApp(),
     ),
@@ -32,7 +35,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LocaleBloc, LocaleState>( // هنا نستخدم LocaleBloc
+    return BlocBuilder<LocaleBloc, LocaleState>(
       builder: (context, localeState) {
         return BlocBuilder<ThemeBloc, ThemeState>(
           builder: (context, themeState) {
@@ -42,7 +45,7 @@ class MyApp extends StatelessWidget {
               darkTheme: AppTheme.darkTheme,
               themeMode: themeState.themeMode,
               onGenerateRoute: AppRouter.generateRoute,
-              initialRoute: '/NavView',
+              initialRoute: '/splash',
               locale: localeState.locale, // استخدام اللغة من الـ LocaleBloc
               localizationsDelegates: [
                 AppLocalizations.delegate,

@@ -228,6 +228,7 @@
   "pleaseSelectTypeAndEnterFeedback": "يرجى اختيار النوع وإدخال الملاحظات",
   "feedbackSubmittedSuccessfully": "تم إرسال الملاحظات بنجاح",
   "failedToSubmitFeedback": "فشل في إرسال الملاحظات",
-  "submit": "إرسال"
+  "submit": "إرسال",
+  "audioDeleted": "تم حذف الصوت"
 
 }

@@ -32,7 +32,9 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 0,
             left: 0,
             child: Image.asset(
-              isDarkMode ? "assets/images/background_home_transparent.png" : "assets/images/background.png",
+              isDarkMode
+                  ? "assets/images/background_home_transparent.png"
+                  : "assets/images/background.png",
               fit: BoxFit.cover,
             ),
           ),
@@ -46,32 +48,36 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Text(
                         loc.welcome,
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          color: const Color(0xFFA4A3A3),
-                          fontSize: 42,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.displayLarge?.copyWith(
+                                  color: const Color(0xFFA4A3A3),
+                                  fontSize: 42,
+                                ),
                       ),
                       Text(
                         loc.back,
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          fontSize: 36,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.displayLarge?.copyWith(
+                                  fontSize: 36,
+                                ),
                       ),
                       const SizedBox(height: 65),
                       TextField(
                         controller: emailController,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFFA4A3A3),
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: const Color(0xFFA4A3A3),
+                            ),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.email_outlined),
                           hintText: loc.emailAddress,
-                          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: const Color(0xFFA4A3A3),
-                          ),
+                          hintStyle:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: const Color(0xFFA4A3A3),
+                                  ),
                           filled: true,
                           fillColor: const Color(0xFFF4F4F4),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -81,26 +87,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 30),
                       TextField(
                         controller: passwordController,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFFA4A3A3),
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: const Color(0xFFA4A3A3),
+                            ),
                         obscureText: !isPasswordVisible,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock_outline),
                           hintText: loc.password,
-                          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: const Color(0xFFA4A3A3),
-                          ),
+                          hintStyle:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: const Color(0xFFA4A3A3),
+                                  ),
                           filled: true,
                           fillColor: const Color(0xFFF4F4F4),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                              isPasswordVisible
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                             ),
                             onPressed: () {
                               setState(() {
@@ -123,9 +133,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           Text(
                             loc.rememberMe,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFFA4A3A3),
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: const Color(0xFFA4A3A3),
+                                ),
                           ),
                         ],
                       ),
@@ -154,33 +167,38 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           builder: (context, state) {
                             if (state is AuthLoading) {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                             return ElevatedButton(
                               onPressed: () {
                                 final email = emailController.text.trim();
                                 final password = passwordController.text.trim();
                                 context.read<AuthBloc>().add(LoginRequested(
-                                  email: email,
-                                  password: password,
-                                  rememberMe: rememberMe,
-                                ));
+                                      email: email,
+                                      password: password,
+                                      rememberMe: rememberMe,
+                                    ));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
                                 minimumSize: const Size(80, 20),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: Text(
                                 loc.logIn,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                               ),
                             );
                           },

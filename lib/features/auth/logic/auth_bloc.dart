@@ -115,7 +115,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         final List<Map<String, dynamic>> history =
-        data.cast<Map<String, dynamic>>();
+            data.cast<Map<String, dynamic>>();
         emit(HistoryLoaded(history: history));
       } else if (response.statusCode == 401) {
         await _storage.deleteAll();
@@ -140,24 +140,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
 
     try {
-      final newToken = await updateUser(event.username, event.email);
+      final result = await updateUser(event.username, event.email);
 
-      if (newToken != null) {
+      if (result['success'] == true && result['token'] != null) {
         await Future.wait([
           _storage.write(key: 'username', value: event.username),
           _storage.write(key: 'email', value: event.email),
-          _storage.write(key: 'token', value: newToken),
+          _storage.write(key: 'token', value: result['token']),
         ]);
 
         await userService.setUser(username: event.username, email: event.email);
 
         // Emit the state after updating the user
-        emit(UserUpdatedState(username: event.username, email: event.email));
+        emit(UserUpdatedState(
+          username: event.username,
+          email: event.email,
+          message: result['message'], // Optional: Include message in state
+        ));
       } else {
-        emit(AuthError("Failed to update user profile"));
+        emit(AuthError(result['message'] ?? "Failed to update user profile"));
       }
-    } on Exception catch (e) {
-      if (e.toString().contains("No token found")) {
+    } catch (e) {
+      if (e.toString().contains("No token found") ||
+          (e is Exception && e.toString().contains("No token found"))) {
         await _storage.deleteAll();
         emit(Unauthenticated(message: "Session expired. Please log in again."));
       } else {
@@ -189,10 +194,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (historyResponse.statusCode == 200) {
           final List<dynamic> data = jsonDecode(historyResponse.body);
           final List<Map<String, dynamic>> history =
-          data.cast<Map<String, dynamic>>();
+              data.cast<Map<String, dynamic>>();
           emit(HistoryLoaded(history: history));
         } else {
-          emit(HistoryError(message: 'Failed to load history: ${historyResponse.body}'));
+          emit(HistoryError(
+              message: 'Failed to load history: ${historyResponse.body}'));
         }
       } else {
         emit(HistoryError(message: 'Failed to delete audio: ${response.body}'));
@@ -219,7 +225,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'audio_id':event.audioId,
+          'audio_id': event.audioId,
           'audio_name': event.audioName,
           'is_fake': event.isFake,
           'confidence': event.confidence,
@@ -233,25 +239,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         add(GetHistoryRequested());
       } else {
-        emit(HistoryError(message: 'Failed to save analysis: ${response.body}'));
+        emit(
+            HistoryError(message: 'Failed to save analysis: ${response.body}'));
       }
     } catch (e) {
       emit(HistoryError(message: e.toString()));
     }
   }
 
-
   Future<void> _onChangePasswordRequested(
-      ChangePasswordRequested event,
-      Emitter<AuthState> emit,
-      ) async {
+    ChangePasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(ChangePasswordLoading());
 
     try {
       final token = await _storage.read(key: 'token');
 
       if (token == null) {
-        emit(ChangePasswordFailure(error: 'Session expired. Please log in again.'));
+        emit(ChangePasswordFailure(
+            error: 'Session expired. Please log in again.'));
         return;
       }
 
@@ -259,7 +266,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         Uri.parse('${APIsConstants.baseURL}/reset_password'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // If your API requires Bearer token auth
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
           'reset_token': token,
@@ -271,7 +278,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(ChangePasswordSuccess(message: 'Password updated successfully'));
       } else {
         final data = jsonDecode(response.body);
-        emit(ChangePasswordFailure(error: data['message'] ?? 'Failed to update password'));
+        emit(ChangePasswordFailure(
+            error: data['message'] ?? 'Failed to update password'));
       }
     } catch (e) {
       emit(ChangePasswordFailure(error: e.toString()));

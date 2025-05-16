@@ -73,7 +73,7 @@ class DoneChangePassword extends StatelessWidget {
                   // "Password Changed" text
                   Text(
                     'Password Changed',
-                    style:textTheme.displayLarge,
+                    style: textTheme.displayLarge,
                   ),
                   const SizedBox(height: 6),
                   // "Password Changed Successfully" text
@@ -94,7 +94,7 @@ class DoneChangePassword extends StatelessWidget {
                       onPressed: () {
                         Navigator.pushNamed(
                           context,
-                          '/home',
+                          '/login',
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -105,7 +105,7 @@ class DoneChangePassword extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text(
-                        'Finish',
+                        'Log in',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,

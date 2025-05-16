@@ -232,6 +232,7 @@
   "pleaseSelectTypeAndEnterFeedback": "Bitte wählen Sie den Typ aus und geben Sie Feedback ein",
   "feedbackSubmittedSuccessfully": "Feedback erfolgreich gesendet",
   "failedToSubmitFeedback": "Fehler beim Senden des Feedbacks",
-  "submit": "Senden"
+  "submit": "Senden",
+  "audioDeleted":"Audio gelöscht"
 
 }

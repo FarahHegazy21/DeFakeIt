@@ -220,7 +220,8 @@
   "pleaseSelectTypeAndEnterFeedback": "Veuillez sélectionner le type et entrer votre retour",
   "feedbackSubmittedSuccessfully": "Retour envoyé avec succès",
   "failedToSubmitFeedback": "Échec de l'envoi du retour",
-  "submit": "Envoyer"
+  "submit": "Envoyer",
+  "audioDeleted":"Audio Supprimé"
 
 
 

@@ -109,17 +109,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: '${local.forgot}\n',
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF8F9193),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 32,
-                            height: 1.2,
-                          ),
-                        ),
+                            text: '${local.forgot}\n',
+                            style: textTheme.displayLarge?.copyWith(
+                              color: const Color(0xFF8F9193),
+                              fontSize: 36,
+                            )),
                         TextSpan(
                           text: local.password,
-                          style: textTheme.displayMedium,
+                          style: textTheme.displayLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 36,
+                          ),
                         ),
                       ],
                     ),
@@ -154,11 +154,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         border: InputBorder.none,
                         contentPadding:
-                        const EdgeInsets.symmetric(vertical: 16),
-
+                            const EdgeInsets.symmetric(vertical: 16),
                       ),
                       style: TextStyle(
-                        color: isDarkMode ? Colors.black45 : Colors.white,  // تقدر كمان تتحكم في حجم الخط وغيره
+                        color: isDarkMode
+                            ? Colors.black45
+                            : const Color(0xFFA4A3A3),
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -185,13 +186,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                        local.send,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
+                              local.send,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 36),

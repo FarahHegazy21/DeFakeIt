@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:defakeit/core/constant/APIs_constants.dart';
 
-Future<String?> updateUser(String username, String email,
+Future<Map<String, dynamic>> updateUser(String username, String email,
     {bool rememberMe = true}) async {
   final url =
       Uri.parse('${APIsConstants.baseURL}${APIsConstants.updateUserEndpoint}');
@@ -13,7 +13,7 @@ Future<String?> updateUser(String username, String email,
     final token = await storage.read(key: 'token');
     if (token == null) {
       print("Update Failed: No token found");
-      return null;
+      return {'success': false, 'message': 'No token found'};
     }
 
     final response = await http.post(
@@ -28,10 +28,16 @@ Future<String?> updateUser(String username, String email,
       }),
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+    print("API Status Code: ${response.statusCode}");
+    print("API Response: ${response.body}");
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+    if (response.statusCode == 200 && data['token'] != null) {
       final newToken = data['token'] as String?;
-      final message = data['message'] as String?;
+      final message = data['message'] as String? ??
+          data['msg'] ??
+          'Profile updated successfully';
 
       if (newToken != null) {
         await storage.write(key: 'username', value: username);
@@ -39,13 +45,19 @@ Future<String?> updateUser(String username, String email,
         await storage.write(key: 'token', value: newToken);
 
         print("Update Success. New Token: $newToken, Message: $message");
-        return newToken;
+        return {'success': true, 'token': newToken, 'message': message};
       }
     }
-    print("Update Failed: ${response.body}");
-    return null;
+
+    // Handle non-200 status codes or missing token
+    final errorMessage = data['message'] ??
+        data['error'] ??
+        data['msg'] ??
+        'Failed to update profile (Status: ${response.statusCode})';
+    print("Update Failed: $errorMessage");
+    return {'success': false, 'message': errorMessage};
   } catch (e) {
     print("Update Error: $e");
-    return null;
+    return {'success': false, 'message': 'Error: $e'};
   }
 }

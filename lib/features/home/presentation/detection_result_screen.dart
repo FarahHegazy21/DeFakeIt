@@ -2,7 +2,7 @@ import 'package:defakeit/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';  // لازم تولد ملفات الترجمة
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // لازم تولد ملفات الترجمة
 import '../../../core/APIs/post_feedback.dart';
 
 class DetectionResultScreen extends StatelessWidget {
@@ -26,7 +26,7 @@ class DetectionResultScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     if (percentage >= 75) return loc.high;
     if (percentage <= 59) return loc.low;
-    return loc.normal;
+    return loc.medium;
   }
 
   @override
@@ -62,7 +62,8 @@ class DetectionResultScreen extends StatelessWidget {
               children: [
                 Text(
                   loc.detectionResults,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -108,10 +109,14 @@ class DetectionResultScreen extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text(
                       confidenceLevel,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(color: color, fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: confidence >= 0.75
+                                ? Colors.green
+                                : confidence <= 59
+                                    ? Colors.orange
+                                    : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ],
                 ),
@@ -137,7 +142,8 @@ class DetectionResultScreen extends StatelessWidget {
                       ),
                       child: Text(
                         loc.feedback,
-                        style: const TextStyle(color: Colors.white, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),
                     const SizedBox(width: 20),
@@ -154,7 +160,8 @@ class DetectionResultScreen extends StatelessWidget {
                       ),
                       child: Text(
                         loc.cancel,
-                        style: const TextStyle(color: Colors.white, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),
                   ],
@@ -210,14 +217,16 @@ class DetectionResultScreen extends StatelessWidget {
                       Radio<String>(
                         value: loc.good,
                         groupValue: feedbackType,
-                        onChanged: (value) => setState(() => feedbackType = value),
+                        onChanged: (value) =>
+                            setState(() => feedbackType = value),
                       ),
                       Text(loc.good),
                       const SizedBox(width: 20),
                       Radio<String>(
                         value: loc.issue,
                         groupValue: feedbackType,
-                        onChanged: (value) => setState(() => feedbackType = value),
+                        onChanged: (value) =>
+                            setState(() => feedbackType = value),
                       ),
                       Text(loc.issue),
                     ],
@@ -293,7 +302,7 @@ class DetectionResultScreen extends StatelessWidget {
     String url;
     if (platform == 'facebook') {
       url =
-      "https://www.facebook.com/sharer/sharer.php?u=https://example.com=$message";
+          "https://www.facebook.com/sharer/sharer.php?u=https://example.com=$message";
     } else if (platform == 'instagram') {
       url = "https://www.instagram.com/?text=$message";
     } else {

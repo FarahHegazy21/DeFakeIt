@@ -19,7 +19,7 @@ class CreateNewPasswordScreen extends StatefulWidget {
 class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-  TextEditingController();
+      TextEditingController();
   final _storage = const FlutterSecureStorage();
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
@@ -88,7 +88,8 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('${APIsConstants.baseURL}${APIsConstants.resetPasswordEndpoint}'),
+        Uri.parse(
+            '${APIsConstants.baseURL}${APIsConstants.resetPasswordEndpoint}'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'reset_token': _resetToken,
@@ -129,12 +130,16 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(
+          Positioned(
+            top: 0,
+            right: 0,
+            left: 0,
             child: Image.asset(
               isDarkMode
                   ? "assets/images/background_home_transparent.png"
                   : "assets/images/background.png",
               fit: BoxFit.cover,
+              color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
             ),
           ),
           SafeArea(
@@ -161,15 +166,17 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                   const SizedBox(height: 40),
                   Text(
                     loc.create,
-                    style: GoogleFonts.poppins(
+                    style: textTheme.displayLarge?.copyWith(
                       color: const Color(0xFF8F9193),
-                      fontWeight: FontWeight.w500,
-                      fontSize: 32,
+                      fontSize: 36,
                     ),
                   ),
                   Text(
                     loc.newPassword,
-                    style: textTheme.displayMedium,
+                    style: textTheme.displayLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 36,
+                    ),
                   ),
                   const SizedBox(height: 40),
                   _buildPasswordField(
@@ -218,13 +225,13 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                        loc.save,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
+                              loc.save,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                 ],

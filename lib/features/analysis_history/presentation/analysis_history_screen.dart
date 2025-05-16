@@ -1,3 +1,4 @@
+import 'package:defakeit/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -37,10 +38,8 @@ class AnalysisHistoryScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   Text(
                     AppLocalizations.of(context)!.analysisHistory,
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: AppTheme.textTheme.displayMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
                     ),
                     textAlign: TextAlign.center,
                   ),

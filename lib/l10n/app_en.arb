@@ -235,6 +235,7 @@
   "pleaseSelectTypeAndEnterFeedback": "Please select type and enter feedback",
   "feedbackSubmittedSuccessfully": "Feedback submitted successfully",
   "failedToSubmitFeedback": "Failed to submit feedback",
-  "submit": "Submit"
+  "submit": "Submit",
+  "audioDeleted": "Audio Deleted"
 
 }

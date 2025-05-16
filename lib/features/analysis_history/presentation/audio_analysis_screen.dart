@@ -48,7 +48,9 @@ class AudioAnalysisScreen extends StatelessWidget {
             right: 0,
             left: 0,
             child: Image.asset(
-              isDarkMode ? "assets/images/background_home_transparent.png" : "assets/images/background.png",
+              isDarkMode
+                  ? "assets/images/background_home_transparent.png"
+                  : "assets/images/background.png",
               fit: BoxFit.cover,
             ),
           ),
@@ -64,13 +66,17 @@ class AudioAnalysisScreen extends StatelessWidget {
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: Icon(Icons.arrow_back_ios_new,
-                            color: isDarkMode ?AppTheme.textColorLightWhite : AppTheme.secondaryColor),
+                            color: isDarkMode
+                                ? AppTheme.textColorLightWhite
+                                : AppTheme.secondaryColor),
                       ),
                       Expanded(
                         child: Center(
                           child: Text(
                             audioName,
-                            style: textTheme.displayMedium,
+                            style: textTheme.displayMedium?.copyWith(
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                       ),
@@ -120,19 +126,19 @@ class AudioAnalysisScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        confidence >= 0.8
+                        confidence >= 0.75
                             ? loc.high
-                            : confidence >= 0.5
-                            ? loc.medium
-                            : loc.low,
+                            : confidence <= 59
+                                ? loc.medium
+                                : loc.low,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: confidence >= 0.8
+                          color: confidence >= 0.75
                               ? Colors.green
-                              : confidence >= 0.5
-                              ? Colors.orange
-                              : Colors.red,
+                              : confidence <= 59
+                                  ? Colors.orange
+                                  : Colors.red,
                         ),
                       ),
                     ],
@@ -202,19 +208,19 @@ class AudioAnalysisScreen extends StatelessWidget {
                       InkWell(
                         onTap: () => _launchURL(facebookUrl),
                         child:
-                        Image.asset('assets/images/fb_icon.png', width: 35),
+                            Image.asset('assets/images/fb_icon.png', width: 35),
                       ),
                       const SizedBox(width: 20),
                       InkWell(
                         onTap: () => _launchURL(instagramUrl),
                         child:
-                        Image.asset('assets/images/ig_icon.png', width: 35),
+                            Image.asset('assets/images/ig_icon.png', width: 35),
                       ),
                       const SizedBox(width: 20),
                       InkWell(
                         onTap: () => _launchURL(twitterUrl),
                         child:
-                        Image.asset('assets/images/X_icon.png', width: 35),
+                            Image.asset('assets/images/X_icon.png', width: 35),
                       ),
                     ],
                   ),

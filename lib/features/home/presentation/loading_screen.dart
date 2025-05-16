@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';  // تأكد إنك عامل generate لل localization
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // تأكد إنك عامل generate لل localization
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -23,7 +23,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void startLoading() {
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       setState(() {
-        _progress += 0.01;  // زيادة التقدم بشكل أوضح
+        _progress += 0.001;
         if (_progress >= 1.0) {
           _timer?.cancel();
         }
@@ -58,7 +58,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
             children: [
               Text(
                 AppLocalizations.of(context)!.analyzingAudio,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 30),
               CircularPercentIndicator(

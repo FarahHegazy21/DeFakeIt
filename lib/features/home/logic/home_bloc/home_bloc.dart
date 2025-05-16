@@ -17,7 +17,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<StartAnalysis>(_onStartAnalysis);
     on<ClearPickedAudio>(_onClearPickedAudio);
     on<AnalysisFailed>(_onAnalysisFailed);
-    on<GetAudiosCount>(_onGetAudiosCount);
   }
 
   void _onAudioPicked(AudioPicked event, Emitter<HomeState> emit) {
@@ -66,29 +65,5 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _onAnalysisFailed(AnalysisFailed event, Emitter<HomeState> emit) {
     emit(ErrorState(message: event.message));
-  }
-
-  Future<void> _onGetAudiosCount(
-      GetAudiosCount event, Emitter<HomeState> emit) async {
-    emit(HistoryLoading());
-
-    try {
-      final token = await _storage.read(key: 'token');
-      if (token == null) {
-        emit(const ErrorState(message: 'Please login to view history'));
-        return;
-      }
-
-      final history = await audioService.getAudioHistory(token);
-      emit(HistoryLoaded(history: history, totalAudios: history.length));
-    } on InvalidTokenException {
-      await _storage.deleteAll();
-      emit(const ErrorState(message: 'Session expired. Please log in again.'));
-    } on ServerOfflineException {
-      emit(const ErrorState(
-          message: 'Server is offline. Please try again later.'));
-    } catch (e) {
-      emit(ErrorState(message: 'Failed to fetch history: $e'));
-    }
   }
 }

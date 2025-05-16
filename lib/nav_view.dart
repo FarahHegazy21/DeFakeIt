@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class NavView extends StatefulWidget {
   const NavView({super.key});
 
@@ -36,7 +35,9 @@ class _NavViewState extends State<NavView> {
               right: 0,
               left: 0,
               child: Image.asset(
-                isDarkMode ? "assets/images/background_home_transparent.png" : "assets/images/background.png",
+                isDarkMode
+                    ? "assets/images/background_home_transparent.png"
+                    : "assets/images/background.png",
                 fit: BoxFit.cover,
                 //color: isDarkMode ? Colors.white.withOpacity(0.2) : null,
               ),
@@ -53,7 +54,7 @@ class _NavViewState extends State<NavView> {
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(18.0),
+        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10),
         child: Container(
           decoration: BoxDecoration(
             color: AppTheme.primaryColor,
@@ -71,7 +72,7 @@ class _NavViewState extends State<NavView> {
             borderRadius: BorderRadius.circular(30),
             child: BottomNavigationBar(
               backgroundColor:
-              Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+                  Theme.of(context).bottomNavigationBarTheme.backgroundColor,
               currentIndex: _selectedIndex,
               onTap: (index) {
                 setState(() {

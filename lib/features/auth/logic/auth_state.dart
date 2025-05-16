@@ -36,7 +36,6 @@ class HistoryError extends AuthState {
 
 class AnalysisSaved extends AuthState {}
 
-
 class ChangePasswordLoading extends AuthState {}
 
 class ChangePasswordSuccess extends AuthState {
@@ -52,9 +51,14 @@ class ChangePasswordFailure extends AuthState {
 class UserUpdatedState extends AuthState {
   final String username;
   final String email;
+  final String? message; // Add message field
 
-  UserUpdatedState({required this.username, required this.email});
+  UserUpdatedState({
+    required this.username,
+    required this.email,
+    this.message,
+  });
 
   @override
-  List<Object> get props => [username, email];
+  List<Object?> get props => [username, email, message];
 }

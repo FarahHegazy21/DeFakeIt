@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/ThemeBLoC.dart';
 import '../../../core/theme/theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../../auth/logic/auth_bloc.dart';
 import '../../auth/logic/auth_event.dart';
 
@@ -25,128 +24,135 @@ class _SettingsScreen1State extends State<SettingsScreen> {
     final textTheme = Theme.of(context).textTheme;
     final primaryColor = Theme.of(context).primaryColor;
 
-    return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // AppBar
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          AppLocalizations.of(context)!.settings,
+          style: textTheme.displayMedium,
+        ),
+        centerTitle: true,
+        actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const BackButton(),
-                Text(
-                  AppLocalizations.of(context)!.settings, // استخدام الترجمة هنا
-                  style: textTheme.displayMedium,
-                ),
-                IconButton(
-                  icon: Image.asset(
-                    'assets/images/logout_icon.png',
-                    width: 45,
-                    height: 45,
-                    color: textTheme.displayMedium?.color,
-                  ),
-                  onPressed: () {
-                    context.read<AuthBloc>().add(LogoutRequested());
-                    Navigator.pushNamed(context, '/login');
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // General Section
-          _sectionLabel(AppLocalizations.of(context)!.general), // الترجمة هنا
-          _settingsItem(
-            title: AppLocalizations.of(context)!.language, // الترجمة هنا
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _selectedLanguage,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
-              ],
-            ),
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      LanguageScreen(selectedLanguage: _selectedLanguage),
-                ),
-              );
-              if (result != null && result is String) {
-                setState(() {
-                  _selectedLanguage = result;
-                });
-              }
-            },
-          ),
-          _divider(),
-
-          _settingsItem(
-            title: isDarkMode ? AppLocalizations.of(context)!.lightMode : AppLocalizations.of(context)!.darkMode, // الترجمة هنا
-            leading: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/images/sun_icon.png',
-                  width: 22,
-                  height: 22,
-                  color: textTheme.bodyMedium?.color,
-                ),
-                const SizedBox(width: 6),
-              ],
-            ),
-            trailing: BlocBuilder<ThemeBloc, ThemeState>(
-              builder: (context, state) {
-                return Switch(
-                  value: state.themeMode == ThemeMode.dark,
-                  onChanged: (_) {
-                    context.read<ThemeBloc>().add(ToggleThemeEvent());
-                  },
-                  activeColor: AppTheme.secondaryColor,
-                );
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: Image.asset(
+                'assets/images/logout_icon.png',
+                width: 45,
+                height: 45,
+                color: textTheme.displayMedium?.color,
+              ),
+              onPressed: () {
+                context.read<AuthBloc>().add(LogoutRequested());
+                Navigator.pushNamed(context, '/login');
               },
             ),
-            onTap: () {},
-          ),
-          _divider(),
-
-          _settingsItem(
-            title: AppLocalizations.of(context)!.contactUs, // الترجمة هنا
-            trailing: const Icon(Icons.chevron_right,
-                color: Colors.grey, size: 20),
-            onTap: () {},
-          ),
-          const SizedBox(height: 26),
-
-          // Security Section
-          _sectionLabel(AppLocalizations.of(context)!.security), // الترجمة هنا
-          _settingsItem(
-            title: AppLocalizations.of(context)!.changePassword, // الترجمة هنا
-            trailing: const Icon(Icons.chevron_right,
-                color: Colors.grey, size: 20),
-            onTap: () {
-              Navigator.pushNamed(context, '/ChangePasswordScreen');
-            },
-          ),
-          _divider(),
-
-          _settingsItem(
-            title: AppLocalizations.of(context)!.privacyPolicy, // الترجمة هنا
-            trailing: const Icon(Icons.chevron_right,
-                color: Colors.grey, size: 20),
-            onTap: _showPrivacyPolicy,
           ),
         ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // General Section
+              _sectionLabel(AppLocalizations.of(context)!.general),
+              _settingsItem(
+                title: AppLocalizations.of(context)!.language,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _selectedLanguage,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right,
+                        color: Colors.grey, size: 20),
+                  ],
+                ),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          LanguageScreen(selectedLanguage: _selectedLanguage),
+                    ),
+                  );
+                  if (result != null && result is String) {
+                    setState(() {
+                      _selectedLanguage = result;
+                    });
+                  }
+                },
+              ),
+              _divider(),
+
+              _settingsItem(
+                title: isDarkMode
+                    ? AppLocalizations.of(context)!.lightMode
+                    : AppLocalizations.of(context)!.darkMode,
+                leading: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/sun_icon.png',
+                      width: 22,
+                      height: 22,
+                      color: textTheme.bodyMedium?.color,
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                ),
+                trailing: BlocBuilder<ThemeBloc, ThemeState>(
+                  builder: (context, state) {
+                    return Switch(
+                      value: state.themeMode == ThemeMode.dark,
+                      onChanged: (_) {
+                        context.read<ThemeBloc>().add(ToggleThemeEvent());
+                      },
+                      activeColor: AppTheme.secondaryColor,
+                    );
+                  },
+                ),
+                onTap: () {},
+              ),
+              _divider(),
+
+              _settingsItem(
+                title: AppLocalizations.of(context)!.contactUs,
+                trailing: const Icon(Icons.chevron_right,
+                    color: Colors.grey, size: 20),
+                onTap: () {},
+              ),
+              const SizedBox(height: 26),
+
+              // Security Section
+              _sectionLabel(AppLocalizations.of(context)!.security),
+              _settingsItem(
+                title: AppLocalizations.of(context)!.changePassword,
+                trailing: const Icon(Icons.chevron_right,
+                    color: Colors.grey, size: 20),
+                onTap: () {
+                  Navigator.pushNamed(context, '/ChangePasswordScreen');
+                },
+              ),
+              _divider(),
+
+              _settingsItem(
+                title: AppLocalizations.of(context)!.privacyPolicy,
+                trailing: const Icon(Icons.chevron_right,
+                    color: Colors.grey, size: 20),
+                onTap: _showPrivacyPolicy,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -157,9 +163,9 @@ class _SettingsScreen1State extends State<SettingsScreen> {
       child: Text(
         label,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: Colors.grey,
-          fontWeight: FontWeight.w500,
-        ),
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
       ),
     );
   }
@@ -204,18 +210,18 @@ class _SettingsScreen1State extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: Text(AppLocalizations.of(context)!.privacyPolicy, // الترجمة هنا
+        title: Text(AppLocalizations.of(context)!.privacyPolicy,
             style: Theme.of(context).textTheme.displayMedium),
         content: SingleChildScrollView(
           child: Text(
-            AppLocalizations.of(context)!.privacyPolicyContent, // الترجمة هنا
+            AppLocalizations.of(context)!.privacyPolicyContent,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.close, // الترجمة هنا
+            child: Text(AppLocalizations.of(context)!.close,
                 style: TextStyle(color: AppTheme.secondaryColor)),
           ),
         ],

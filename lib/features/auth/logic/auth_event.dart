@@ -39,7 +39,6 @@ class UpdateUserRequested extends AuthEvent {
   List<Object> get props => [username, email];
 }
 
-
 class DeleteAudioRequested extends AuthEvent {
   final int audioId;
 
@@ -47,7 +46,7 @@ class DeleteAudioRequested extends AuthEvent {
 }
 
 class SaveAnalysisRequested extends AuthEvent {
-  final int  audioId ;
+  final int audioId;
   final String audioName;
   final bool isFake;
   final double confidence;

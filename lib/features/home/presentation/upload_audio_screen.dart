@@ -2,8 +2,9 @@ import 'dart:io';
 import 'package:defakeit/features/home/logic/home_bloc/home_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import localization
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../core/theme/theme.dart';
 
 class UploadAudioScreen extends StatelessWidget {
@@ -12,12 +13,25 @@ class UploadAudioScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+    ));
+
+    final cardColor = theme.cardColor;
+    final shadowColor =
+        isDarkMode ? Colors.black12 : Colors.black.withOpacity(0.1);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           loc.uploadAudio,
-          style: Theme.of(context).textTheme.bodyLarge,
+          style: textTheme.bodyLarge,
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -60,11 +74,11 @@ class UploadAudioScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: shadowColor,
                         blurRadius: 10,
                         spreadRadius: 2,
                       ),
@@ -77,13 +91,14 @@ class UploadAudioScreen extends StatelessWidget {
                       Icon(
                         Icons.audiotrack,
                         size: 80,
-                        color: AppTheme.primaryColor,
+                        color: isDarkMode
+                            ? AppTheme.secondaryColor
+                            : AppTheme.primaryColor,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         '${loc.selected}: ${state.fileName}',
-                        style:
-                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -96,12 +111,15 @@ class UploadAudioScreen extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             context.read<HomeBloc>().add(
-                              StartAnalysis(state.audioFile),
-                            );
+                                  StartAnalysis(state.audioFile),
+                                );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primaryColor,
-                            foregroundColor: Colors.white,
+                            backgroundColor: isDarkMode
+                                ? AppTheme.secondaryColor
+                                : AppTheme.primaryColor,
+                            foregroundColor:
+                                isDarkMode ? Colors.black : Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -130,7 +148,8 @@ class UploadAudioScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                               side: BorderSide(
-                                  color: Colors.red.withOpacity(0.3)),
+                                color: Colors.red.withOpacity(0.3),
+                              ),
                             ),
                           ),
                         ),
@@ -158,21 +177,23 @@ class UploadAudioScreen extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * 0.9,
                 height: 60,
                 child: ElevatedButton.icon(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.upload_file,
                     size: 28,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                   label: Text(
                     loc.uploadAudioFile,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
+                    style: textTheme.titleLarge?.copyWith(
+                      color: isDarkMode ? Colors.black : Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryColor,
-                    foregroundColor: Colors.white,
+                    backgroundColor: isDarkMode
+                        ? AppTheme.secondaryColor
+                        : AppTheme.primaryColor,
+                    foregroundColor: isDarkMode ? Colors.black : Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -183,7 +204,7 @@ class UploadAudioScreen extends StatelessWidget {
                   ),
                   onPressed: () async {
                     FilePickerResult? result =
-                    await FilePicker.platform.pickFiles(
+                        await FilePicker.platform.pickFiles(
                       type: FileType.custom,
                       allowedExtensions: ['mp3', 'wav'],
                       allowMultiple: false,

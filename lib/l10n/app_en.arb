@@ -30,7 +30,7 @@
   "security": "Security",
   "changePassword": "Change Password",
   "privacyPolicy": "Privacy Policy",
-  "privacyPolicyContent": "DefakeIt respects and protects your privacy... [cut for brevity]",
+  "privacyPolicyContent": "DefakeIt respects and protects your privacy...",
   "close": "Close",
   "hiUser": "Hi, {username}",
   "readyToCheck": "Ready to check\naudio authenticity?",

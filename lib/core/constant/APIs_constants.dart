@@ -1,5 +1,6 @@
 class APIsConstants {
-  static const String baseURL = 'https://myfakeaudio.loca.lt';
+  static const String baseURL =
+      'https://defakeit-app-cpgjbyged9ghfgf2.switzerlandnorth-01.azurewebsites.net';
   static const String logInEndPoint = '/login';
   static const String signUpEndPoint = '/signup';
   static const String uploadAudioEndpoint = '/upload_audio';

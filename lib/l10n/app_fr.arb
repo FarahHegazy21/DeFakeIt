@@ -30,7 +30,7 @@
   "security": "Sécurité",
   "changePassword": "Changer le mot de passe",
   "privacyPolicy": "Politique de confidentialité",
-  "privacyPolicyContent": "DefakeIt respecte et protège votre vie privée... [coupé]",
+  "privacyPolicyContent": "DefakeIt respecte et protège votre vie privée...",
   "close": "Fermer",
   "hiUser": "Bonjour, {username}",
   "readyToCheck": "Prêt à vérifier\nl'authenticité de l'audio?",

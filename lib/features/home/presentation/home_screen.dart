@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';  // استيراد ملف الترجمة
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../auth/logic/auth_bloc.dart';
 import '../../auth/logic/auth_state.dart';
 import 'record_audio_screen.dart';
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!; // اختصار الترجمة
+    final loc = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
 
     return BlocListener<AuthBloc, AuthState>(
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 26, vertical: 12),
+                                    horizontal: 16, vertical: 12),
                               ),
                             ),
                           ),

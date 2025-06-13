@@ -67,7 +67,7 @@ class WelcomeScreen extends StatelessWidget {
             /// Main Content
             Column(
               children: [
-                const Spacer(flex: 5),
+                const Spacer(flex: 7),
                 Text(
                   loc.letsGet,
                   style: textTheme.displayLarge?.copyWith(

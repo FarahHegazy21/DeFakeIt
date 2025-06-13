@@ -48,10 +48,11 @@ class _SignUpScreenState extends State<SignupScreen> {
                     children: [
                       Text(
                         local.createAccount,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: const Color(0xFFA4A3A3),
-                          fontSize: 42,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.displayLarge?.copyWith(
+                                  color: const Color(0xFFA4A3A3),
+                                  fontSize: 42,
+                                ),
                       ),
                       const SizedBox(height: 65),
                       TextField(
@@ -62,7 +63,8 @@ class _SignUpScreenState extends State<SignupScreen> {
                           hintText: local.username,
                           filled: true,
                           fillColor: Colors.grey[100],
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -79,7 +81,8 @@ class _SignUpScreenState extends State<SignupScreen> {
                           hintText: local.email,
                           filled: true,
                           fillColor: Colors.grey[100],
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -96,7 +99,8 @@ class _SignUpScreenState extends State<SignupScreen> {
                           hintText: local.password,
                           filled: true,
                           fillColor: Colors.grey[100],
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
                             borderSide: BorderSide.none,
@@ -116,9 +120,12 @@ class _SignUpScreenState extends State<SignupScreen> {
                           ),
                           Text(
                             local.rememberMe,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFFA4A3A3),
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: const Color(0xFFA4A3A3),
+                                ),
                           ),
                         ],
                       ),
@@ -147,7 +154,8 @@ class _SignUpScreenState extends State<SignupScreen> {
                           },
                           builder: (context, state) {
                             if (state is AuthLoading) {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                             return ElevatedButton(
                               onPressed: () {
@@ -155,27 +163,31 @@ class _SignUpScreenState extends State<SignupScreen> {
                                 final email = emailController.text.trim();
                                 final password = passwordController.text.trim();
                                 context.read<AuthBloc>().add(SignUpRequested(
-                                  username: username,
-                                  email: email,
-                                  password: password,
-                                  rememberMe: rememberMe,
-                                ));
+                                      username: username,
+                                      email: email,
+                                      password: password,
+                                      rememberMe: rememberMe,
+                                    ));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
                                 minimumSize: const Size(80, 20),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: Text(
                                 local.signUp,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                               ),
                             );
                           },

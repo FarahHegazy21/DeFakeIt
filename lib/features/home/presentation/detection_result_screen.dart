@@ -1,9 +1,12 @@
 import 'package:defakeit/core/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // لازم تولد ملفات الترجمة
 import '../../../core/APIs/post_feedback.dart';
+import '../logic/home_bloc/home_bloc.dart';
 
 class DetectionResultScreen extends StatelessWidget {
   final bool isFake;
@@ -32,6 +35,11 @@ class DetectionResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+    ));
     final confidencePercentage = (confidence * 100).toStringAsFixed(0);
     final color = isFake ? Colors.red : Colors.green;
 
@@ -46,15 +54,7 @@ class DetectionResultScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDarkMode
-                ? [Colors.black, Colors.grey]
-                : [Colors.white, const Color(0xFFF5F5F5)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: isDarkMode ? Colors.black : Colors.white,
         child: Center(
           child: SingleChildScrollView(
             child: Column(
@@ -112,9 +112,9 @@ class DetectionResultScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: confidence >= 0.75
                                 ? Colors.green
-                                : confidence <= 59
-                                    ? Colors.orange
-                                    : Colors.red,
+                                : confidence <= 0.59
+                                    ? Colors.red
+                                    : Colors.orange,
                             fontWeight: FontWeight.bold,
                           ),
                     ),
@@ -148,8 +148,10 @@ class DetectionResultScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
-                      onPressed: () =>
-                          Navigator.pushReplacementNamed(context, '/home'),
+                      onPressed: () {
+                        context.read<HomeBloc>().add(ClearPickedAudio());
+                        Navigator.pushReplacementNamed(context, '/home');
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.secondaryColor,
                         shape: RoundedRectangleBorder(
@@ -208,6 +210,9 @@ class DetectionResultScreen extends StatelessWidget {
         return StatefulBuilder(
           builder: (ctx, setState) {
             return AlertDialog(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              scrollable: true,
               title: Text(loc.sendFeedback),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -299,14 +304,16 @@ class DetectionResultScreen extends StatelessWidget {
         "Audio: $audioName\n"
         "Uploaded: $uploadDate";
 
+    final encodedMessage = Uri.encodeComponent(message);
+
     String url;
     if (platform == 'facebook') {
       url =
-          "https://www.facebook.com/sharer/sharer.php?u=https://example.com=$message";
+          "https://www.facebook.com/sharer/sharer.php?u=https://example.com=$encodedMessage";
     } else if (platform == 'instagram') {
-      url = "https://www.instagram.com/?text=$message";
+      url = "https://www.instagram.com/?text=$encodedMessage";
     } else {
-      url = "https://twitter.com/intent/tweet?text=$message";
+      url = "https://twitter.com/intent/tweet?text=$encodedMessage";
     }
 
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);

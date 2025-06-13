@@ -41,7 +41,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _usernameController.text != widget.initialUsername ||
       _emailController.text != widget.initialEmail;
 
-  // HERE IS WHERE _saveUserData GOES
   Future<void> _saveUserData() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -60,8 +59,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _usernameController.text,
         _emailController.text,
       );
-
-      print("UpdateUser Result: $result"); // Debug log
 
       if (result['success'] == true && result['token'] != null) {
         await Future.wait([
@@ -145,137 +142,156 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(height: 150),
                 Padding(
                   padding: const EdgeInsets.all(30.0),
-                  child: Card(
-                    elevation: 20,
-                    shape: RoundedRectangleBorder(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color:
+                          isDarkMode ? AppTheme.backgroundDark : Colors.white,
                       borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                      border: Border.all(
+                        color: isDarkMode
+                            ? AppTheme.secondaryColor
+                            : AppTheme.primaryColor,
+                        width: 5,
+                      ),
                     ),
-                    color: isDarkMode
-                        ? AppTheme.backgroundDark
-                        : AppTheme.backgroundLight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: [
-                            Text(
-                              loc.editProfile,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium
-                                  ?.copyWith(
-                                    color: isDarkMode
-                                        ? AppTheme.textColorLightWhite
-                                        : AppTheme.textColorLightDarkBlue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            const SizedBox(height: 30),
-                            if (_errorMessage != null) ...[
+                    child: Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      color: Colors.transparent,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
                               Text(
-                                _errorMessage!,
-                                style: const TextStyle(color: Colors.red),
+                                loc.editProfile,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium
+                                    ?.copyWith(
+                                      color: isDarkMode
+                                          ? AppTheme.textColorLightWhite
+                                          : AppTheme.textColorLightDarkBlue,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
-                              const SizedBox(height: 10),
-                            ],
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                hintText: loc.email,
-                                prefixIcon: Icon(Icons.email,
-                                    color: AppTheme.primaryColor),
-                                hintStyle:
-                                    Theme.of(context).textTheme.bodyMedium,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
+                              const SizedBox(height: 30),
+                              if (_errorMessage != null) ...[
+                                Text(
+                                  _errorMessage!,
+                                  style: const TextStyle(color: Colors.red),
                                 ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 15, horizontal: 20),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return loc.pleaseEnterEmail;
-                                }
-                                if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                    .hasMatch(value)) {
-                                  return loc.pleaseEnterValidEmail;
-                                }
-                                return null;
-                              },
-                              onChanged: (value) => setState(() {}),
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _usernameController,
-                              decoration: InputDecoration(
-                                hintText: loc.username,
-                                hintStyle:
-                                    Theme.of(context).textTheme.bodyMedium,
-                                prefixIcon: Icon(Icons.person,
-                                    color: AppTheme.primaryColor),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide:
-                                      BorderSide(color: AppTheme.primaryColor),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 15, horizontal: 20),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return loc.pleaseEnterUsername;
-                                }
-                                return null;
-                              },
-                              onChanged: (value) => setState(() {}),
-                            ),
-                            const SizedBox(height: 30),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 60,
-                              child: ElevatedButton(
-                                onPressed: (_isSaving || !_hasChanges)
-                                    ? null
-                                    : _saveUserData, // Calls _saveUserData
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _hasChanges
-                                      ? AppTheme.primaryColor
-                                      : Colors.grey,
-                                  shape: RoundedRectangleBorder(
+                                const SizedBox(height: 10),
+                              ],
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  hintText: loc.email,
+                                  prefixIcon: Icon(Icons.email,
+                                      color: AppTheme.primaryColor),
+                                  hintStyle:
+                                      Theme.of(context).textTheme.bodyMedium,
+                                  border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
+                                    borderSide: BorderSide(
+                                        color: AppTheme.primaryColor),
                                   ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    borderSide: BorderSide(
+                                        color: AppTheme.primaryColor),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 20),
                                 ),
-                                child: _isSaving
-                                    ? const CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      )
-                                    : Text(
-                                        loc.save,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return loc.pleaseEnterEmail;
+                                  }
+                                  if (!RegExp(
+                                          r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                      .hasMatch(value)) {
+                                    return loc.pleaseEnterValidEmail;
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) => setState(() {}),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: _usernameController,
+                                decoration: InputDecoration(
+                                  hintText: loc.username,
+                                  hintStyle:
+                                      Theme.of(context).textTheme.bodyMedium,
+                                  prefixIcon: Icon(Icons.person,
+                                      color: AppTheme.primaryColor),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    borderSide: BorderSide(
+                                        color: AppTheme.primaryColor),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    borderSide: BorderSide(
+                                        color: AppTheme.primaryColor),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 20),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return loc.pleaseEnterUsername;
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) => setState(() {}),
+                              ),
+                              const SizedBox(height: 30),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 60,
+                                child: ElevatedButton(
+                                  onPressed: (_isSaving || !_hasChanges)
+                                      ? null
+                                      : _saveUserData,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _hasChanges
+                                        ? AppTheme.primaryColor
+                                        : Colors.grey,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                  ),
+                                  child: _isSaving
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        )
+                                      : Text(
+                                          loc.save,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

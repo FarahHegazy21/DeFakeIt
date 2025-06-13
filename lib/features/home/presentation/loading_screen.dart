@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // تأكد إنك عامل generate لل localization
 
@@ -40,18 +41,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+    ));
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDarkMode
-                ? [Colors.black, Colors.grey]
-                : [Colors.white, const Color(0xFFF5F5F5)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: isDarkMode ? Colors.black : Colors.white,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

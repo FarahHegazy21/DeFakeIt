@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:defakeit/features/home/logic/home_bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -109,6 +110,15 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final fileReady = _recordedFilePath != null && _isRecorded;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+    ));
 
     return Scaffold(
       appBar: AppBar(
@@ -162,8 +172,11 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                       Icon(
                         _isRecording ? Icons.mic : Icons.mic_none,
                         size: 100,
-                        color:
-                            _isRecording ? Colors.green : AppTheme.primaryColor,
+                        color: _isRecording
+                            ? Colors.green
+                            : isDarkMode
+                                ? AppTheme.secondaryColor
+                                : AppTheme.primaryColor,
                       ),
                       const SizedBox(height: 16),
                       if (_isRecording)
@@ -183,8 +196,11 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _isRecording
                                 ? Colors.green
-                                : AppTheme.primaryColor,
-                            foregroundColor: Colors.white,
+                                : isDarkMode
+                                    ? AppTheme.secondaryColor
+                                    : AppTheme.primaryColor,
+                            foregroundColor:
+                                isDarkMode ? Colors.black : Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -229,13 +245,19 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                         children: [
                           Expanded(
                             child: ElevatedButton.icon(
-                              icon: const Icon(Icons.analytics),
+                              icon: Icon(
+                                Icons.analytics,
+                                color: isDarkMode ? Colors.black : Colors.white,
+                              ),
                               label: Text(
                                 loc.analyze,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
-                                    ?.copyWith(color: Colors.white),
+                                    ?.copyWith(
+                                        color: isDarkMode
+                                            ? Colors.black
+                                            : Colors.white),
                               ),
                               onPressed: fileReady
                                   ? () {
@@ -246,8 +268,11 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.primaryColor,
-                                foregroundColor: Colors.white,
+                                backgroundColor: isDarkMode
+                                    ? AppTheme.secondaryColor
+                                    : AppTheme.primaryColor,
+                                foregroundColor:
+                                    isDarkMode ? Colors.black : Colors.white,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
@@ -259,18 +284,25 @@ class _RecordAudioScreenState extends State<RecordAudioScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: ElevatedButton.icon(
-                              icon: const Icon(Icons.delete),
+                              icon: Icon(
+                                Icons.delete,
+                                color: isDarkMode ? Colors.black : Colors.white,
+                              ),
                               label: Text(
                                 loc.delete,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
-                                    ?.copyWith(color: Colors.white),
+                                    ?.copyWith(
+                                        color: isDarkMode
+                                            ? Colors.black
+                                            : Colors.white),
                               ),
                               onPressed: _deleteAudio,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
+                                foregroundColor:
+                                    isDarkMode ? Colors.black : Colors.white,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(

@@ -30,7 +30,7 @@
   "security": "الأمان",
   "changePassword": "تغيير كلمة المرور",
   "privacyPolicy": "سياسة الخصوصية",
-  "privacyPolicyContent": "تطبيق DefakeIt يحترم ويحمي خصوصيتك... [اختصار]",
+  "privacyPolicyContent": "تطبيق DefakeIt يحترم ويحمي خصوصيتك...",
   "close": "إغلاق",
   "hiUser": "مرحبًا، {username}",
   "readyToCheck": "هل أنت جاهز للتحقق من\nأصالة الصوت؟",

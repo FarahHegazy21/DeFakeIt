@@ -136,9 +136,9 @@ class AudioAnalysisScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: confidence >= 0.75
                               ? Colors.green
-                              : confidence <= 59
-                                  ? Colors.orange
-                                  : Colors.red,
+                              : confidence <= 0.59
+                                  ? Colors.red
+                                  : Colors.orange,
                         ),
                       ),
                     ],
